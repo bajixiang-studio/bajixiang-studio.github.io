@@ -3351,8 +3351,8 @@ p, li { font-size: 26px !important; }
 /* ===== 八吉祥 簡潔版（深藍金）：覆蓋舊樣式，放在所有樣式之後 ===== */
 :root{--sec-a:#0B1F3A;--sec-b:#0F2846;--line:rgba(201,168,76,.22)}
 html,body{scroll-behavior:smooth}
-body{font-size:16.5px !important;line-height:1.85;background:var(--sec-a) !important}
-body p,body li{font-size:16.5px !important;line-height:1.9}
+body{font-size:18px !important;line-height:1.85;background:var(--sec-a) !important}
+body p,body li{font-size:18px !important;line-height:1.9}
 [id]{scroll-margin-top:84px}
 
 /* 拿掉多餘的裝飾與動態 */
@@ -3415,14 +3415,24 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 
 /* 區塊標題 */
 .sh{margin-bottom:44px !important}
-.sbadge{font-family:'Cormorant Garamond',serif !important;font-style:italic;font-size:15px !important;letter-spacing:3px !important;text-transform:none !important;margin-bottom:10px !important}
-.stitle,.cta-title{font-family:'Noto Serif TC',serif !important;font-size:clamp(24px,3vw,32px) !important;letter-spacing:4px !important;color:var(--gold-p) !important;font-weight:400 !important}
-.ssub,.cta-sub{font-size:16px !important;letter-spacing:1px !important;line-height:1.9 !important}
-.gline{width:40px !important}
+.sbadge{font-family:'Cormorant Garamond',serif !important;font-style:italic;font-size:18px !important;letter-spacing:3px !important;text-transform:none !important;margin-bottom:12px !important;color:var(--gold-l) !important}
+/* 區塊主標題：放大、金色漸層字加光暈 */
+.stitle,.cta-title{font-family:'Noto Serif TC',serif !important;font-size:clamp(30px,4vw,44px) !important;letter-spacing:6px !important;font-weight:600 !important;line-height:1.35 !important;
+  background:linear-gradient(180deg,#FFF6DD 0%,#F5E6B8 45%,#D9B460 100%);-webkit-background-clip:text;background-clip:text;color:transparent !important;
+  filter:drop-shadow(0 2px 14px rgba(201,168,76,.35))}
+.stitle span,.cta-title span{color:transparent !important}
+/* 副標與內文：比主標小一點，提亮 */
+.ssub,.cta-sub{font-size:clamp(17px,1.6vw,20px) !important;letter-spacing:1.5px !important;line-height:1.9 !important;color:rgba(250,246,238,.82) !important}
+/* 標題下的金線：加寬、加亮，並有一道光持續掃過 */
+.gline{width:120px !important;height:2px !important;position:relative;overflow:hidden;margin-top:22px !important;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent) !important;box-shadow:0 0 12px rgba(201,168,76,.55)}
+.gline::after{content:"";position:absolute;top:0;bottom:0;left:-45%;width:45%;background:linear-gradient(90deg,transparent,#FFF8E1,transparent);animation:bjxGline 2.6s ease-in-out infinite}
+@keyframes bjxGline{to{left:100%}}
+@media (prefers-reduced-motion:reduce){.gline::after{animation:none}}
 .hb-subhead{font-size:18px !important;letter-spacing:3px !important;margin:48px 0 22px !important}
 
 /* 各區塊內文字縮小到好讀的大小 */
-.about-intro{font-size:17px !important;line-height:2.1 !important}
+.about-intro{font-size:19px !important;line-height:2.1 !important;color:rgba(250,246,238,.9) !important}
 .event-tag,.event-free{font-size:14px !important;letter-spacing:2px !important}
 .event-title-sub{font-size:18px !important}
 .event-detail-icon{font-size:22px !important}
@@ -3439,9 +3449,9 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 .cta-btn-label{font-size:15px !important;letter-spacing:1.5px !important}
 .qr-label{font-size:16px !important}
 .qr-sublabel{font-size:13px !important}
-.faq-q{font-size:17px !important;letter-spacing:1px !important}
+.faq-q{font-size:19px !important;letter-spacing:1px !important}
 .faq-arrow{font-size:22px !important}
-.faq-a,.faq-a span{font-size:15.5px !important}
+.faq-a,.faq-a span{font-size:17px !important}
 .d1-h{font-size:22px !important}
 .d1-p{font-size:16px !important}
 .d1-k{font-size:13px !important}
@@ -3457,9 +3467,9 @@ footer{border-top:1px solid var(--line) !important}
 .footer-logo-cn{font-size:22px !important}
 .footer-logo-en{font-size:19px !important}
 .footer-col-title{font-size:13px !important;letter-spacing:2px !important}
-.footer-links a,.footer-links a span{font-size:15px !important}
-.footer-tagline{font-size:14.5px !important}
-.footer-contact{font-size:14.5px !important}
+.footer-links a,.footer-links a span{font-size:16.5px !important}
+.footer-tagline{font-size:15.5px !important}
+.footer-contact{font-size:15.5px !important}
 .footer-copy{font-size:14px !important}
 .social-btn{font-size:16px !important}
 .float-line{width:48px !important;height:48px !important;font-size:24px !important;animation:none !important}
@@ -3482,7 +3492,8 @@ footer{border-top:1px solid var(--line) !important}
   .nav-logo-cn{font-size:19px !important}
   .nav-logo-en{font-size:13px !important}
   nav > .lang-toggle-btn{margin-left:auto !important;margin-right:12px}
-  body p,body li{font-size:16px !important}
+  body p,body li{font-size:16.5px !important}
+  .stitle,.cta-title{font-size:26px !important;letter-spacing:2px !important}
   .hero-content{padding:104px 18px 64px !important}
   .btn-primary,.btn-outline{padding:12px 22px !important;font-size:14px !important}
   .hero-btns .btn-primary,.hero-btns .btn-outline{font-size:17px !important;padding:14px 28px !important;letter-spacing:3px !important}
@@ -4455,7 +4466,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
           <span class="cta-btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20 3H4C3.45 3 3 3.45 3 4V20C3 20.55 3.45 21 4 21H12.62V14.39H10.22V11.62H12.62V9.57C12.62 7.18 14.08 5.89 16.21 5.89C17.24 5.89 18.12 5.97 18.38 6V8.49H16.91C15.74 8.49 15.51 9.06 15.51 9.88V11.62H18.3L17.93 14.39H15.51V21H20C20.55 21 21 20.55 21 20V4C21 3.45 20.55 3 20 3Z"/></svg></span>
           <span class="cta-btn-label i18n-zh">Facebook<br>粉絲專頁</span><span class="cta-btn-label i18n-en">Facebook<br>Page</span>
         </a>
-        <a href="mailto:hugospiritual777@gmail.com" class="cta-btn cta-btn-email">
+        <a href="mailto:bajixiang.studio@gmail.com" class="cta-btn cta-btn-email">
           <span class="cta-btn-shimmer"></span>
           <span class="cta-btn-corner tl"></span><span class="cta-btn-corner tr"></span>
           <span class="cta-btn-corner bl"></span><span class="cta-btn-corner br"></span>
@@ -4547,7 +4558,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
         <div class="footer-logo-en">Eight Auspicious Music Studio</div>
         <p class="footer-tagline i18n-zh">聲音 × 頻率 × 芳療 × 頌缽<br>用愛與專業守護你的身心靈健康<br>Return to Balance · Return to Nature · Return to Your Soul</p><p class="footer-tagline i18n-en">Sound × Frequency × Aromatherapy × Singing Bowls<br>Guarding your body, mind and spirit with love and expertise<br>Return to Balance · Return to Nature · Return to Your Soul</p>
         <div class="footer-contacts">
-          <div class="footer-contact">✉ hugospiritual777@gmail.com</div>
+          <div class="footer-contact">✉ bajixiang.studio@gmail.com</div>
         </div>
         <div style="margin-top:14px">
           <a href="https://lin.ee/Q8XKTw6" class="social-btn">💬</a>
@@ -4583,7 +4594,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
           <li><a href="https://lin.ee/Q8XKTw6"><span class="i18n-zh">加入 LINE 群組</span><span class="i18n-en">Join LINE Group</span></a></li>
           <li><a href="https://www.facebook.com/share/1CU7UXaZgC/?mibextid=wwXIfr" target="_blank"><span class="i18n-zh">Facebook 粉絲頁</span><span class="i18n-en">Facebook Page</span></a></li>
           <li><a href="#">Instagram</a></li>
-          <li><a href="mailto:hugospiritual777@gmail.com"><span class="i18n-zh">Email 諮詢</span><span class="i18n-en">Email Us</span></a></li>
+          <li><a href="mailto:bajixiang.studio@gmail.com"><span class="i18n-zh">Email 諮詢</span><span class="i18n-en">Email Us</span></a></li>
         </ul>
       </div>
     </div>
