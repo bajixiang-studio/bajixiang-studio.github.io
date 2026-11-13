@@ -3526,7 +3526,8 @@ iframe.bjx-embed{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0
 /* ===== 課程方案：分類篩選＋課程卡 ===== */
 #pricing.cc-ready .plan-series,#pricing.cc-ready #extra-courses-container{display:none !important}
 .cc-wrap{letter-spacing:.5px}  /* 原本 #pricing 整區有 6px 字距，卡片不要繼承 */
-.cc-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:-8px 0 30px}
+/* 分類按鈕列在收合區最上面，收合區會裁掉超出的部分，所以不能用負邊距，上方留一點空間 */
+.cc-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:0 0 30px;padding-top:3px}
 .cc-chip{background:transparent;border:1px solid var(--line);color:var(--text-m);font:14px 'Noto Serif TC',serif;letter-spacing:1px;padding:7px 18px;border-radius:999px;cursor:pointer;transition:all .25s}
 .cc-chip:hover{border-color:var(--gold);color:var(--gold-l)}
 .cc-chip.on{background:var(--gold);border-color:var(--gold);color:var(--navy)}
@@ -3586,7 +3587,7 @@ body .cc-feats li{font-size:15px !important;color:var(--text-c)}
 .cc-legacy .modal-features{margin:0;padding-left:1.2em;display:grid;gap:6px}
 body .cc-legacy li,body .cc-legacy .modal-note{font-size:15px !important;color:var(--text-c);line-height:1.8}
 .cc-legacy .modal-note{border-left:2px solid var(--line);padding-left:10px;color:var(--text-m)}
-@media (max-width:600px){.cc-chips{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding:0 2px 8px;scrollbar-width:none}.cc-chips::-webkit-scrollbar{display:none}.cc-chip{flex:none}}
+@media (max-width:600px){.cc-chips{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding:3px 2px 8px;scrollbar-width:none}.cc-chips::-webkit-scrollbar{display:none}.cc-chip{flex:none}}
 @media (max-width:700px){.cc-m-top{grid-template-columns:minmax(0,1fr)}.cc-m-img{max-width:320px;margin:0 auto}}
 
 /* ===== 療癒分享 ===== */
