@@ -3501,6 +3501,72 @@ iframe.bjx-embed{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0
 .hl-frame iframe.bjx-embed{height:100%;aspect-ratio:auto}
 .extra-gallery-item:hover iframe.bjx-embed{transform:none}
 
+/* ===== 課程方案：分類篩選＋課程卡 ===== */
+#pricing.cc-ready .plan-series,#pricing.cc-ready #extra-courses-container{display:none !important}
+.cc-wrap{letter-spacing:.5px}  /* 原本 #pricing 整區有 6px 字距，卡片不要繼承 */
+.cc-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:-8px 0 30px}
+.cc-chip{background:transparent;border:1px solid var(--line);color:var(--text-m);font:14px 'Noto Serif TC',serif;letter-spacing:1px;padding:7px 18px;border-radius:999px;cursor:pointer;transition:all .25s}
+.cc-chip:hover{border-color:var(--gold);color:var(--gold-l)}
+.cc-chip.on{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:24px;align-items:start}
+.cc{border:1px solid var(--line);background:rgba(255,255,255,.025);display:flex;flex-direction:column;transition:border-color .25s,transform .25s}
+.cc:hover{border-color:rgba(201,168,76,.6);transform:translateY(-3px)}
+.cc[hidden]{display:none}
+.cc-media{position:relative;background:#081830;cursor:pointer}
+.cc-media img{display:block;width:100%;height:auto}
+.cc-badge{position:absolute;top:12px;left:12px;font-size:12.5px;letter-spacing:1.5px;padding:4px 12px;border-radius:999px;background:rgba(8,24,46,.85);border:1px solid var(--gold);color:var(--gold-l)}
+.cc-badge.s-open{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.cc-badge.s-soon{border-color:#8FC3E8;color:#BFE0F7}
+.cc-badge.s-full,.cc-badge.s-ended{border-color:rgba(250,246,238,.35);color:rgba(250,246,238,.6)}
+.cc-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px}
+.cc-cat{font-size:13px;color:var(--gold);letter-spacing:2px}
+.cc-title{font:400 19px/1.5 'Noto Serif TC',serif !important;color:var(--gold-p);letter-spacing:1.5px}
+.cc-sessions-label{font-size:13px;color:var(--text-m)}
+.cc-sessions{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.cc-session{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px !important;line-height:1.6;padding:7px 10px;border-left:2px solid var(--gold);background:rgba(201,168,76,.06)}
+.cc-session.is-full,.cc-session.is-ended{opacity:.5;border-left-color:rgba(250,246,238,.3)}
+.cc-s-date{color:var(--cream)}
+.cc-s-time,.cc-s-loc{color:var(--text-m)}
+.cc-s-status{color:var(--gold-l);font-size:12.5px}
+.cc-sessions-more{font-size:13px;color:var(--gold-l)}
+.cc-duration{font-size:14px;color:var(--text-m)}
+body .cc-summary{font-size:15px !important;line-height:1.85;color:var(--text-c);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cc-more{align-self:flex-start;margin-top:4px;background:transparent;border:1px solid var(--gold);color:var(--gold-l);font:14px 'Noto Serif TC',serif;letter-spacing:2px;padding:9px 20px;border-radius:2px;cursor:pointer;transition:all .25s}
+.cc-more:hover{background:var(--gold);color:var(--navy)}
+.cc-modal{position:fixed;inset:0;z-index:1100;background:rgba(4,12,26,.82);display:none;align-items:center;justify-content:center;padding:20px}
+.cc-modal.on{display:flex}
+.cc-modal-box{position:relative;width:min(100%,920px);max-height:calc(100vh - 40px);overflow:auto;background:#0E2747;border:1px solid var(--line);padding:clamp(20px,4vw,36px)}
+.cc-modal-x{position:sticky;top:0;float:right;margin:-8px -8px 0 0;background:transparent;border:0;color:var(--gold-l);font-size:24px;cursor:pointer;z-index:2}
+.cc-m-top{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:28px;align-items:start}
+.cc-m-img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+.cc-m-info{display:flex;flex-direction:column;gap:10px}
+.cc-m-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.cc-m-head .cc-badge{position:static}
+.cc-m-title{font:400 24px/1.45 'Noto Serif TC',serif !important;color:var(--gold-p);letter-spacing:2px}
+.cc-m-h{font-size:13px;letter-spacing:2px;color:var(--gold);margin-top:8px;font-weight:400}
+body .cc-m-p{font-size:15.5px !important;line-height:1.9;color:var(--text-c)}
+.cc-pre{white-space:pre-line}
+.cc-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cc-price-early{font:400 24px 'Noto Serif TC',serif;color:var(--gold-l)}
+.cc-price-tag{font-size:13px;color:var(--gold)}
+.cc-price-orig{font-size:15px;color:var(--text-m)}
+body .cc-m-note{font-size:14px !important;color:var(--text-m);border-left:2px solid var(--line);padding-left:10px;white-space:pre-line}
+.cc-m-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.cc-btn{display:inline-block;text-decoration:none;border:1px solid var(--gold);color:var(--gold-l);font:15px 'Noto Serif TC',serif;letter-spacing:2px;padding:11px 26px;border-radius:2px}
+.cc-btn-main{background:#06C755;border-color:#06C755;color:#fff}
+.cc-m-sec{margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+.cc-feats{margin:8px 0 0;padding-left:1.2em;display:grid;gap:6px}
+body .cc-feats li{font-size:15px !important;color:var(--text-c)}
+.cc-m-photos{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.cc-m-photos img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.cc-legacy .modal-section{margin-bottom:18px}
+.cc-legacy .modal-section-title{font-size:13px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+.cc-legacy .modal-features{margin:0;padding-left:1.2em;display:grid;gap:6px}
+body .cc-legacy li,body .cc-legacy .modal-note{font-size:15px !important;color:var(--text-c);line-height:1.8}
+.cc-legacy .modal-note{border-left:2px solid var(--line);padding-left:10px;color:var(--text-m)}
+@media (max-width:600px){.cc-chips{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding:0 2px 8px;scrollbar-width:none}.cc-chips::-webkit-scrollbar{display:none}.cc-chip{flex:none}}
+@media (max-width:700px){.cc-m-top{grid-template-columns:minmax(0,1fr)}.cc-m-img{max-width:320px;margin:0 auto}}
+
 /* ===== 療癒分享 ===== */
 #stories[hidden]{display:none !important}
 .st-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:-12px 0 30px}
@@ -3614,15 +3680,8 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
     <li class="has-sub"><a href="#pricing"><span class="i18n-zh">課程</span><span class="i18n-en">Courses</span></a>
       <ul class="sub-menu">
         <li><a href="#gallery"><span class="i18n-zh">熱門課程</span><span class="i18n-en">Popular Courses</span></a></li>
-        <li class="has-sub-flyout"><a href="#pricing"><span class="i18n-zh">課程方案總覽</span><span class="i18n-en">All Programs</span></a>
-          <ul class="sub-menu-flyout">
-            <li><a href="#plan-intro"><span class="i18n-zh">體驗入門系列</span><span class="i18n-en">Intro Series</span></a></li>
-            <li><a href="#plan-full"><span class="i18n-zh">完整療癒系列</span><span class="i18n-en">Full Healing Series</span></a></li>
-            <li><a href="#plan-deep"><span class="i18n-zh">深度療癒系列</span><span class="i18n-en">Deep Healing Series</span></a></li>
-            <li><a href="#plan-training"><span class="i18n-zh">專業培訓系列</span><span class="i18n-en">Professional Training</span></a></li>
-            <li><a href="#plan-group"><span class="i18n-zh">團體紓壓方案</span><span class="i18n-en">Group Programs</span></a></li>
-            <li><a href="#plan-member"><span class="i18n-zh">會員專屬方案</span><span class="i18n-en">Membership Plans</span></a></li>
-          </ul>
+        <li class="has-sub-flyout"><a href="#bjx-courses"><span class="i18n-zh">課程分類</span><span class="i18n-en">By Category</span></a>
+          <ul class="sub-menu-flyout" id="bjx-course-cats"></ul>
         </li>
         <li><a href="#teachers"><span class="i18n-zh">師資介紹</span><span class="i18n-en">Teachers</span></a></li>
         <li><a href="#frequencies"><span class="i18n-zh">八大頻率系統</span><span class="i18n-en">Frequency System</span></a></li>
@@ -6695,7 +6754,7 @@ document.addEventListener('keydown', function(e) {
 <script id="bjx-clean-js">
 /* 首頁精簡：長區塊只顯示前段，按「展開完整內容」才看全部；從選單跳進收合區塊時自動展開 */
 (function () {
-  var FOLDS = { pricing: 640, teachers: 600, travel: 560, 'health-biz': 620, stories: 760 };
+  var FOLDS = { pricing: 1000, teachers: 600, travel: 560, 'health-biz': 620, stories: 760 };
   var BG = { teachers: '#0F2846', travel: '#0F2846' };
 
   function setup(id, h) {
@@ -6905,6 +6964,280 @@ document.addEventListener('keydown', function(e) {
   }
 
   document.addEventListener('DOMContentLoaded', function () { load().catch(function (e) { console.error('療癒分享載入失敗：', e); }); });
+})();
+</script>
+<script id="bjx-courses-js">
+/* 課程方案：分類篩選＋課程卡，點開看費用與介紹（資料來自後台「課程管理」） */
+(function () {
+  var SUPABASE_URL = "https://vmwwmowgijcskcrajmzg.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_2LJUwfRcENwZrRoTDiebdA_G8BYzjIP";
+  var LINE_URL = "https://lin.ee/Q8XKTw6";
+  var PLAN_CAT = "會員專屬方案";
+  var STATUS_EN = { "招生中": "Open", "即將開課": "Coming Soon", "隨時預約": "By Appointment", "已額滿": "Full", "已結束": "Ended" };
+  var STATUS_CLS = { "招生中": "open", "即將開課": "soon", "隨時預約": "appt", "已額滿": "full", "已結束": "ended" };
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  // 中英文各一個 span，由 body.lang-en 決定顯示哪個；英文留空就顯示中文
+  function bi(tag, cls, zh, en) {
+    var e = el(tag, cls);
+    e.appendChild(el('span', 'i18n-zh', zh || ''));
+    e.appendChild(el('span', 'i18n-en', (en && String(en).trim()) ? en : (zh || '')));
+    return e;
+  }
+  function lines(t) { return String(t || '').split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean); }
+  function priceText(r) {
+    if (r.price_note) return r.price_note;
+    if (Number(r.price) > 0) return 'NT$ ' + Number(r.price).toLocaleString();
+    return '';
+  }
+
+  // 原本網頁裡寫好的課程介紹視窗（海報、副標、介紹）。資料庫沒填的課程就沿用這些內容
+  function norm(s) { return String(s || '').replace(/\s+/g, '').replace(/（/g, '(').replace(/）/g, ')'); }
+  var staticModals = null;
+  function findStatic(name) {
+    if (!staticModals) {
+      staticModals = [];
+      document.querySelectorAll('.modal-overlay[id^="modal-plan-"]').forEach(function (m) {
+        var t = m.querySelector('.modal-title'), sub = m.querySelector('.modal-sub'), img = m.querySelector('.modal-img');
+        staticModals.push({ id: m.id, title: norm(t && t.textContent), sub: sub ? sub.textContent.trim() : '', img: img ? img.getAttribute('src') : '', el: m });
+      });
+    }
+    var n = norm(name), base = n.replace(/\(.*?\)/g, ''), variant = (n.match(/\((.*?)\)/) || [])[1] || '';
+    var hits = staticModals.filter(function (m) { return m.title === n || m.title === base; });
+    if (!hits.length) hits = staticModals.filter(function (m) { return m.title && (m.title.indexOf(base) >= 0 || base.indexOf(m.title) >= 0); });
+    if (hits.length > 1 && variant) {
+      var v = hits.filter(function (m) { return norm(m.sub).indexOf(variant) >= 0; });
+      if (v.length) hits = v;
+    }
+    return hits[0] || null;
+  }
+
+  function sessionLine(s) {
+    var row = el('li', 'cc-session' + (s.status ? ' is-' + (STATUS_CLS[s.status] || 'x') : ''));
+    row.appendChild(el('span', 'cc-s-date', s.date || ''));
+    if (s.time) row.appendChild(el('span', 'cc-s-time', s.time));
+    if (s.location) row.appendChild(el('span', 'cc-s-loc', s.location));
+    if (s.status) row.appendChild(bi('span', 'cc-s-status', s.status, STATUS_EN[s.status]));
+    return row;
+  }
+
+  function badge(status) {
+    if (!status) return null;
+    return bi('span', 'cc-badge s-' + (STATUS_CLS[status] || 'x'), status, STATUS_EN[status]);
+  }
+
+  function card(r) {
+    var c = el('article', 'cc');
+    c.dataset.cat = r.category;
+    var media = el('div', 'cc-media');
+    if (r.image_url) { var img = el('img'); img.src = r.image_url; img.alt = r.name || ''; img.loading = 'lazy'; media.appendChild(img); }
+    var b = badge(r.status); if (b) media.appendChild(b);
+    c.appendChild(media);
+
+    var body = el('div', 'cc-body');
+    body.appendChild(el('div', 'cc-cat', r.category));
+    body.appendChild(bi('h3', 'cc-title', r.name, r.name_en));
+    var sessions = Array.isArray(r.sessions) ? r.sessions : [];
+    if (sessions.length) {
+      if (sessions.length > 1) body.appendChild(bi('div', 'cc-sessions-label', sessions.length + ' 個場次可選', sessions.length + ' sessions available'));
+      var ul = el('ul', 'cc-sessions');
+      sessions.slice(0, 3).forEach(function (s) { ul.appendChild(sessionLine(s)); });
+      body.appendChild(ul);
+      if (sessions.length > 3) body.appendChild(bi('div', 'cc-sessions-more', '還有 ' + (sessions.length - 3) + ' 個場次，點開看全部', (sessions.length - 3) + ' more — open for all dates'));
+    }
+    if (r.duration_note) body.appendChild(el('div', 'cc-duration', '⏱ ' + r.duration_note));
+    // 沒填一句話簡介時，用介紹的第一行
+    var summary = r.summary || (lines(r.description)[0] || '') || (r.legacy ? r.legacy.sub : '');
+    var summaryEn = r.summary ? r.summary_en : lines(r.description_en)[0];
+    if (summary) body.appendChild(bi('p', 'cc-summary', summary, summaryEn));
+    var more = bi('button', 'cc-more', r.isPlan ? '查看方案內容' : '查看課程介紹與費用', r.isPlan ? 'View plan details' : 'Details & fees');
+    more.type = 'button';
+    more.addEventListener('click', function () { openDetail(r); });
+    body.appendChild(more);
+    c.appendChild(body);
+    media.addEventListener('click', function () { openDetail(r); });
+    return c;
+  }
+
+  // ---- 詳細內容彈窗 ----
+  var modal, modalBody;
+  function closeDetail() {
+    if (!modal) return;
+    modal.classList.remove('on');
+    document.body.style.overflow = '';
+  }
+  function openDetail(r) {
+    if (!modal) {
+      modal = el('div', 'cc-modal');
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      var box = el('div', 'cc-modal-box');
+      var x = el('button', 'cc-modal-x', '✕');
+      x.type = 'button';
+      x.setAttribute('aria-label', '關閉');
+      x.addEventListener('click', closeDetail);
+      modalBody = el('div', 'cc-modal-body');
+      box.appendChild(x);
+      box.appendChild(modalBody);
+      modal.appendChild(box);
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeDetail(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDetail(); });
+      document.body.appendChild(modal);
+    }
+    modalBody.innerHTML = '';
+    var top = el('div', 'cc-m-top');
+    if (r.image_url) { var img = el('img', 'cc-m-img'); img.src = r.image_url; img.alt = r.name || ''; top.appendChild(img); }
+    var info = el('div', 'cc-m-info');
+    var head = el('div', 'cc-m-head');
+    head.appendChild(el('span', 'cc-cat', r.category));
+    var b = badge(r.status); if (b) head.appendChild(b);
+    info.appendChild(head);
+    info.appendChild(bi('h3', 'cc-m-title', r.name, r.name_en));
+
+    var sessions = Array.isArray(r.sessions) ? r.sessions : [];
+    if (sessions.length) {
+      info.appendChild(bi('h4', 'cc-m-h', '上課場次', 'Sessions'));
+      var ul = el('ul', 'cc-sessions');
+      sessions.forEach(function (s) { ul.appendChild(sessionLine(s)); });
+      info.appendChild(ul);
+    }
+    if (r.duration_note) { info.appendChild(bi('h4', 'cc-m-h', '時數', 'Duration')); info.appendChild(el('p', 'cc-m-p', r.duration_note)); }
+
+    var price = priceText(r);
+    if (price || r.early_price) {
+      info.appendChild(bi('h4', 'cc-m-h', '費用', 'Fee'));
+      var pr = el('div', 'cc-price');
+      if (r.early_price) {
+        pr.appendChild(el('span', 'cc-price-early', r.early_price));
+        pr.appendChild(bi('span', 'cc-price-tag', '早鳥價' + (r.early_deadline ? '（' + r.early_deadline + ' 前）' : ''), 'Early bird' + (r.early_deadline ? ' (by ' + r.early_deadline + ')' : '')));
+        if (price) pr.appendChild(el('s', 'cc-price-orig', price));
+      } else {
+        pr.appendChild(bi('span', 'cc-price-early', price, r.price_note_en));
+      }
+      info.appendChild(pr);
+    }
+    if (r.note) info.appendChild(bi('p', 'cc-m-note', r.note, r.note_en));
+
+    var acts = el('div', 'cc-m-acts');
+    var go = el('a', 'cc-btn cc-btn-main');
+    go.href = r.signup_url || LINE_URL;
+    go.target = '_blank';
+    go.rel = 'noopener';
+    go.appendChild(bi('span', '', r.signup_url ? '線上報名' : 'LINE 報名', r.signup_url ? 'Register Online' : 'Register via LINE'));
+    acts.appendChild(go);
+    if (r.signup_url) {
+      var line = el('a', 'cc-btn');
+      line.href = LINE_URL; line.target = '_blank'; line.rel = 'noopener';
+      line.appendChild(bi('span', '', 'LINE 洽詢', 'Ask on LINE'));
+      acts.appendChild(line);
+    }
+    info.appendChild(acts);
+    top.appendChild(info);
+    modalBody.appendChild(top);
+
+    var desc = lines(r.description), descEn = lines(r.description_en);
+    if (desc.length) {
+      var sec = el('div', 'cc-m-sec');
+      sec.appendChild(bi('h4', 'cc-m-h', '課程介紹', 'About this course'));
+      sec.appendChild(bi('p', 'cc-m-p cc-pre', desc.join('\n'), descEn.join('\n')));
+      modalBody.appendChild(sec);
+    }
+    var feats = lines(r.features_text), featsEn = lines(r.features_text_en);
+    // 資料庫還沒填介紹的課程：沿用原本網頁寫好的介紹內容
+    var legacyBody = !desc.length && !feats.length && r.legacy && r.legacy.el.querySelector('.modal-body');
+    if (legacyBody) {
+      var ls = el('div', 'cc-m-sec cc-legacy');
+      ls.innerHTML = legacyBody.innerHTML;
+      modalBody.appendChild(ls);
+    }
+    if (feats.length) {
+      var fs = el('div', 'cc-m-sec');
+      fs.appendChild(bi('h4', 'cc-m-h', '內容與特色', 'Highlights'));
+      var fl = el('ul', 'cc-feats');
+      feats.forEach(function (f, i) { fl.appendChild(bi('li', '', f.replace(/^[-•✦·\s]+/, ''), (featsEn[i] || '').replace(/^[-•✦·\s]+/, ''))); });
+      fs.appendChild(fl);
+      modalBody.appendChild(fs);
+    }
+    if (r.photos && r.photos.length) {
+      var g = el('div', 'cc-m-photos');
+      r.photos.forEach(function (p) { var im = el('img'); im.src = p.image_url; im.loading = 'lazy'; im.alt = ''; g.appendChild(im); });
+      modalBody.appendChild(g);
+    }
+    modal.classList.add('on');
+    modal.querySelector('.cc-modal-box').scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+  }
+
+  // ---- 載入資料 ----
+  async function load() {
+    var sec = document.getElementById('pricing');
+    if (!sec || !window.supabase) return;
+    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    var base = 'id,name,name_en,category,price,price_note,price_note_en,image_url,description,description_en,features_text,features_text_en,sort_order';
+    var cr = await sb.from('courses').select(base + ',status,sessions,duration_note,summary,summary_en,early_price,early_deadline,signup_url,note,note_en').eq('is_active', true).order('sort_order');
+    if (cr.error) cr = await sb.from('courses').select(base).eq('is_active', true).order('sort_order');  // 新欄位還沒建立
+    var pr = await sb.from('membership_plans').select('id,name,name_en,price,image_url,description,description_en,features_text,features_text_en,sort_order').eq('is_active', true).order('sort_order');
+    var ph = await sb.from('course_photos').select('item_type,item_id,image_url,sort_order').order('sort_order');
+    if (cr.error) return;  // 讀不到課程就保留原本的海報版面
+
+    var photos = {};
+    ((!ph.error && ph.data) || []).forEach(function (p) { (photos[p.item_type + ':' + p.item_id] = photos[p.item_type + ':' + p.item_id] || []).push(p); });
+    var rows = (cr.data || []).map(function (r) { r.photos = photos['courses:' + r.id]; r.category = r.category || '其他'; return r; })
+      .concat(((!pr.error && pr.data) || []).map(function (r) { r.isPlan = true; r.category = PLAN_CAT; r.photos = photos['membership_plans:' + r.id]; return r; }));
+    if (!rows.length) return;
+    rows.forEach(function (r) {
+      r.legacy = findStatic(r.name);
+      if (!r.image_url && r.legacy && r.legacy.img) r.image_url = r.legacy.img;
+    });
+
+    var cats = [];
+    rows.forEach(function (r) { if (cats.indexOf(r.category) < 0) cats.push(r.category); });
+
+    var wrap = el('div', 'cc-wrap');
+    wrap.id = 'bjx-courses';
+    var chips = el('div', 'cc-chips');
+    var grid = el('div', 'cc-grid');
+    function filter(cat) {
+      chips.querySelectorAll('.cc-chip').forEach(function (x) { x.classList.toggle('on', x.dataset.cat === cat); });
+      grid.querySelectorAll('.cc').forEach(function (c) { c.hidden = cat !== '' && c.dataset.cat !== cat; });
+    }
+    [''].concat(cats).forEach(function (cat) {
+      var b = cat ? el('button', 'cc-chip', cat) : bi('button', 'cc-chip on', '全部', 'All');
+      b.type = 'button';
+      b.dataset.cat = cat;
+      b.addEventListener('click', function () { filter(cat); });
+      chips.appendChild(b);
+    });
+    rows.forEach(function (r) { grid.appendChild(card(r)); });
+    wrap.appendChild(chips);
+    wrap.appendChild(grid);
+
+    // 放進「展開完整內容」收合區的最前面；沒有收合區就接在標題後面
+    var fold = sec.querySelector('.bjx-fold');
+    if (fold) fold.insertBefore(wrap, fold.firstChild);
+    else { var sh = sec.querySelector('.sh'); sh.parentNode.insertBefore(wrap, sh.nextSibling); }
+    sec.classList.add('cc-ready');  // 隱藏舊的系列海報
+
+    // 選單「課程」底下列出各分類，點了就篩選
+    var flyout = document.getElementById('bjx-course-cats');
+    if (flyout) {
+      flyout.innerHTML = '';
+      cats.forEach(function (cat) {
+        var li = el('li'), a = el('a', '', cat);
+        a.href = '#pricing';
+        a.addEventListener('click', function () { filter(cat); });
+        li.appendChild(a);
+        flyout.appendChild(li);
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { load().catch(function (e) { console.error('課程載入失敗：', e); }); });
 })();
 </script>
 </body>

@@ -1379,6 +1379,93 @@
 
   // ---- 課程管理：編輯 courses / membership_plans 的主圖、說明、特色列表 ----
   var coursesCache = []; // [{table, id, name, category, image_url, description, features_text}]
+  var COURSE_V2_COLS = 'status,sessions,duration_note,summary,summary_en,early_price,early_deadline,signup_url,note,note_en,is_active';
+  var courseV2Ready = false;
+  var COURSE_STATUSES = ['', '招生中', '即將開課', '隨時預約', '已額滿', '已結束'];
+  var SESSION_STATUSES = ['', '已額滿', '已結束'];
+
+  function optionList(values, selected, emptyLabel){
+    return values.map(function(v){
+      return '<option value="' + escapeHtml(v) + '"' + (v === (selected || '') ? ' selected' : '') + '>' + escapeHtml(v || emptyLabel) + '</option>';
+    }).join('');
+  }
+
+  // 上課場次：一列一場，可新增、刪除
+  function sessionRowHtml(s){
+    s = s || {};
+    return '<div class="session-row" style="display:grid;grid-template-columns:1.3fr 1fr 1fr .8fr auto;gap:6px;margin-bottom:6px">' +
+      '<input type="text" class="s-date" placeholder="日期，例：2026/12/6（日）" value="' + escapeHtml(s.date || '') + '">' +
+      '<input type="text" class="s-time" placeholder="時間，例：10:00–17:30" value="' + escapeHtml(s.time || '') + '">' +
+      '<input type="text" class="s-loc" placeholder="地點，例：台北（實體）" value="' + escapeHtml(s.location || '') + '">' +
+      '<select class="s-status">' + optionList(SESSION_STATUSES, s.status, '（這場正常）') + '</select>' +
+      '<button type="button" class="btn-small btn-danger s-del" title="刪除這個場次">×</button>' +
+    '</div>';
+  }
+
+  function courseV2Html(row){
+    if (!courseV2Ready) {
+      return '<div class="field" style="margin-top:8px;border:1px dashed var(--gold-d);padding:10px;font-size:13px">要填寫開課狀態、上課場次、早鳥價，請先到 Supabase 的 SQL Editor 執行 supabase_schema_courses_v2.sql。</div>';
+    }
+    var sessions = Array.isArray(row.sessions) ? row.sessions : [];
+    return '<div class="course-v2" style="margin-top:12px;border:1px solid var(--navy-l);padding:12px">' +
+      '<div class="photo-card-key" style="margin-bottom:10px">開課資訊（顯示在網站課程卡上）</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        '<div class="field"><label>課程名稱</label><input type="text" class="c-name" value="' + escapeHtml(row.name || '') + '"></div>' +
+        '<div class="field"><label>分類</label><input type="text" class="c-cat" value="' + escapeHtml(row.category || '') + '"></div>' +
+        '<div class="field"><label>狀態標籤</label><select class="c-status">' + optionList(COURSE_STATUSES, row.status, '（不顯示）') + '</select></div>' +
+        '<div class="field"><label>時數／堂數（選填）</label><input type="text" class="c-duration" placeholder="例：一天（7.5 小時）、8 週" value="' + escapeHtml(row.duration_note || '') + '"></div>' +
+      '</div>' +
+      '<div class="field"><label>上課場次（同一課程開好幾次，就在這裡加好幾個場次；預約制的課可以不填）</label>' +
+        '<div class="c-sessions">' + sessions.map(sessionRowHtml).join('') + '</div>' +
+        '<button type="button" class="btn-small c-add-session">＋ 新增場次</button>' +
+      '</div>' +
+      '<div class="field"><label>一句話簡介（顯示在課程卡，選填）</label><input type="text" class="c-summary" value="' + escapeHtml(row.summary || '') + '"></div>' +
+      '<div class="field"><label>一句話簡介（英文，選填）</label><input type="text" class="c-summary-en" value="' + escapeHtml(row.summary_en || '') + '"></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">' +
+        '<div class="field"><label>費用（點開課程才看得到）</label><input type="text" class="c-price" placeholder="例：NT$ 3,600、洽詢" value="' + escapeHtml(row.price_note || '') + '"></div>' +
+        '<div class="field"><label>早鳥價（選填）</label><input type="text" class="c-early" placeholder="例：NT$ 3,200" value="' + escapeHtml(row.early_price || '') + '"></div>' +
+        '<div class="field"><label>早鳥截止日（選填）</label><input type="text" class="c-early-deadline" placeholder="例：11/1（六）" value="' + escapeHtml(row.early_deadline || '') + '"></div>' +
+      '</div>' +
+      '<div class="field"><label>備註（顯示在費用下方，選填）</label><textarea rows="2" class="c-note" placeholder="例：請自備頌缽，可借用">' + escapeHtml(row.note || '') + '</textarea></div>' +
+      '<div class="field"><label>備註（英文，選填）</label><textarea rows="2" class="c-note-en">' + escapeHtml(row.note_en || '') + '</textarea></div>' +
+      '<div class="field"><label>報名表單網址（選填；沒填就顯示「LINE 報名」）</label><input type="text" class="c-signup" placeholder="https://forms.gle/..." value="' + escapeHtml(row.signup_url || '') + '"></div>' +
+      '<label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" class="c-active"' + (row.is_active !== false ? ' checked' : '') + ' style="width:auto"> 顯示在網站上</label>' +
+    '</div>';
+  }
+
+  function wireCourseV2(card){
+    var box = card.querySelector('.course-v2');
+    if (!box) return;
+    var list = box.querySelector('.c-sessions');
+    box.querySelector('.c-add-session').addEventListener('click', function(){
+      list.insertAdjacentHTML('beforeend', sessionRowHtml({}));
+    });
+    list.addEventListener('click', function(e){
+      if (e.target.classList.contains('s-del')) e.target.closest('.session-row').remove();
+    });
+  }
+
+  function readCourseV2(card){
+    var box = card.querySelector('.course-v2');
+    if (!box) return null;
+    var v = function(sel){ return box.querySelector(sel).value.trim(); };
+    var sessions = Array.prototype.map.call(box.querySelectorAll('.session-row'), function(r){
+      return {
+        date: r.querySelector('.s-date').value.trim(), time: r.querySelector('.s-time').value.trim(),
+        location: r.querySelector('.s-loc').value.trim(), status: r.querySelector('.s-status').value
+      };
+    }).filter(function(s){ return s.date || s.time || s.location; });
+    var name = v('.c-name');
+    var out = {
+      category: v('.c-cat') || null, status: v('.c-status') || null, duration_note: v('.c-duration') || null,
+      sessions: sessions, summary: v('.c-summary') || null, summary_en: v('.c-summary-en') || null,
+      price_note: v('.c-price') || null, early_price: v('.c-early') || null, early_deadline: v('.c-early-deadline') || null,
+      note: v('.c-note') || null, note_en: v('.c-note-en') || null, signup_url: v('.c-signup') || null,
+      is_active: box.querySelector('.c-active').checked
+    };
+    if (name) out.name = name;
+    return out;
+  }
 
   var coursePhotosCache = {}; // "table:id" -> [{id, image_url, sort_order}, ...]
   function coursePhotosKey(table, id){ return table + ':' + id; }
@@ -1399,9 +1486,15 @@
   async function loadCourses(){
     var list = document.getElementById('coursesList');
     list.innerHTML = '載入中...';
+    var baseCols = 'id,name,name_en,category,image_url,description,description_en,features_text,features_text_en,price_note,price_note_en,sort_order';
     var coursesRes = await sb.from('courses')
-      .select('id,name,name_en,category,image_url,description,description_en,features_text,features_text_en,price_note,price_note_en,sort_order')
+      .select(baseCols + ',' + COURSE_V2_COLS)
       .order('sort_order', { ascending: true });
+    courseV2Ready = !coursesRes.error;
+    if (coursesRes.error) {
+      // 還沒執行 supabase_schema_courses_v2.sql：先用舊欄位，開課資訊區塊會提示要執行 SQL
+      coursesRes = await sb.from('courses').select(baseCols).order('sort_order', { ascending: true });
+    }
     var plansRes = await sb.from('membership_plans')
       .select('id,name,name_en,image_url,description,description_en,features_text,features_text_en,sort_order')
       .order('sort_order', { ascending: true });
@@ -1490,7 +1583,8 @@
           '<div class="field" style="margin-top:8px">' +
             '<label>價格顯示文字（英文，選填）</label>' +
             '<input type="text" class="course-pricenoteen-input" value="' + (row.price_note_en ? escapeHtml(row.price_note_en) : '') + '" placeholder="留空則英文版也顯示中文價格文字">' +
-          '</div>'
+          '</div>' +
+          courseV2Html(row)
         : '') +
         '<div class="field" style="margin-top:8px">' +
           '<label>更多照片（選填，前台使用者點進「詳情」之後才會顯示，卡片正面仍只會顯示上面的主圖）</label>' +
@@ -1513,6 +1607,7 @@
     var featEnInput = card.querySelector('.course-featuresen-input');
     var priceNoteEnInput = card.querySelector('.course-pricenoteen-input');
     var msg = card.querySelector('.msg');
+    wireCourseV2(card);
 
     // ---- 更多照片：只有前台「詳情」彈窗才會顯示，卡片正面維持只有一張主圖 ----
     var extraPhotosWrap = card.querySelector('.course-extra-photos');
@@ -1616,6 +1711,8 @@
         if (priceNoteEnInput) {
           updates.price_note_en = priceNoteEnInput.value.trim() || null;
         }
+        var v2 = readCourseV2(card);
+        if (v2) Object.keys(v2).forEach(function(k){ updates[k] = v2[k]; });
         if (fileInput.files[0]) {
           updates.image_url = await uploadImageFile(fileInput.files[0], 'course-detail');
         }
