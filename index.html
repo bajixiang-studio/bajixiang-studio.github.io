@@ -3446,6 +3446,20 @@ nav,nav.scrolled{background:rgba(11,31,58,.94) !important;backdrop-filter:blur(1
 body .ev-notice p{font-size:16.5px !important;color:var(--text-c);margin-bottom:12px}
 .ev-line{display:inline-block;background:#06C755;color:#fff;text-decoration:none;padding:10px 22px;font-size:15px;letter-spacing:1px;border-radius:2px}
 #event.ev-past .event-tag,#event.ev-past .event-free{display:none !important}
+/* 活動已結束：近期活動區只留說明，活動內容移到精彩時刻 */
+#event.ev-past .event-hero{display:none !important}
+#event.ev-past{padding-bottom:56px !important}
+#event.ev-past .ssub{display:none}
+.ev-acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.ev-more{display:inline-block;border:1px solid var(--gold);color:var(--gold-l);text-decoration:none;padding:10px 22px;font-size:15px;letter-spacing:1px;border-radius:2px}
+.ev-more:hover{background:var(--gold);color:var(--navy)}
+.ev-recap{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:26px;align-items:center;max-width:820px;margin:0 auto 36px;padding:20px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}
+.ev-recap img{width:100%;height:auto;display:block;border-radius:8px}
+.ev-recap-k{font-size:13px;color:var(--gold);letter-spacing:2px}
+.ev-recap-t{font:400 24px/1.4 'Noto Serif TC',serif !important;color:var(--gold-p);margin:6px 0}
+.ev-recap-d{font-size:15px;color:var(--text-c);margin-bottom:6px}
+body .ev-recap-p{font-size:15.5px !important;color:var(--text-m);line-height:1.8}
+@media (max-width:600px){.ev-recap{grid-template-columns:1fr}.ev-recap img{max-width:240px;margin:0 auto}}
 
 /* 手機選單：預約按鈕 */
 .mobile-menu a.menu-cta{background:var(--gold);color:var(--navy) !important;padding:8px 28px;border-radius:2px}
@@ -7556,9 +7570,10 @@ document.addEventListener('keydown', function(e) {
     var d = parseDate(timeEl.textContent);
     var today = new Date(); today.setHours(0, 0, 0, 0);
     var past = !!d && d < today;  // 看不出日期時維持原樣
+    // 已結束：「近期活動」只留一段簡短說明，活動內容改放到「精彩時刻」最上面當作回顧，避免兩區重複
     sec.classList.toggle('ev-past', past);
-    sh.querySelector('.sbadge').innerHTML = past ? '<span class="i18n-zh">Event Recap</span><span class="i18n-en">Event Recap</span>' : original.badge;
-    sh.querySelector('.stitle').innerHTML = past ? '<span class="i18n-zh">活動回顧</span><span class="i18n-en">Event Recap</span>' : original.title;
+    sh.querySelector('.sbadge').innerHTML = past ? '<span class="i18n-zh">Upcoming Events</span><span class="i18n-en">Upcoming Events</span>' : original.badge;
+    sh.querySelector('.stitle').innerHTML = past ? '<span class="i18n-zh">近期活動</span><span class="i18n-en">Upcoming Events</span>' : original.title;
     var link = document.getElementById('event-register-link');
     var reg = link && link.parentNode;
     if (reg) reg.hidden = past;  // 已結束的活動不再顯示報名
@@ -7566,12 +7581,39 @@ document.addEventListener('keydown', function(e) {
     if (past && !note) {
       note = document.createElement('div');
       note.className = 'ev-notice';
-      note.innerHTML = '<p><span class="i18n-zh">目前沒有開放報名的近期活動，以下是最近一次活動的回顧。最新活動消息請洽官方 LINE。</span>' +
-        '<span class="i18n-en">There are no upcoming events open for registration right now. Below is a look back at our latest event. Ask us on LINE for news on upcoming events.</span></p>' +
-        '<a class="ev-line" href="' + LINE_URL + '" target="_blank" rel="noopener"><span class="i18n-zh">LINE 詢問近期活動</span><span class="i18n-en">Ask about upcoming events</span></a>';
+      note.innerHTML = '<p><span class="i18n-zh">目前沒有開放報名的近期活動，最新活動消息請洽官方 LINE。</span>' +
+        '<span class="i18n-en">There are no upcoming events open for registration right now. Ask us on LINE for news on upcoming events.</span></p>' +
+        '<div class="ev-acts"><a class="ev-line" href="' + LINE_URL + '" target="_blank" rel="noopener"><span class="i18n-zh">LINE 詢問近期活動</span><span class="i18n-en">Ask about upcoming events</span></a>' +
+        '<a class="ev-more" href="#highlights"><span class="i18n-zh">看上次活動回顧</span><span class="i18n-en">See our last event</span></a></div>';
       sh.parentNode.insertBefore(note, sh.nextSibling);
     }
     if (note) note.hidden = !past;
+    renderRecap(past);
+  }
+
+  // 「精彩時刻」最上面的上次活動回顧卡：內容直接取自活動區（後台「內容編輯」的資料）
+  function renderRecap(past) {
+    var hl = document.getElementById('highlights');
+    if (!hl) return;
+    var card = hl.querySelector('.ev-recap');
+    if (!past) { if (card) card.remove(); return; }
+    var pick = function (id) { var e = document.getElementById(id); return e ? e.innerHTML.trim() : ''; };
+    var img = document.getElementById('event-main-image');
+    var src = img && img.getAttribute('src');
+    var hasImg = src && src.indexOf('data:image/gif') !== 0;
+    if (!card) {
+      card = document.createElement('article');
+      card.className = 'ev-recap';
+      var sh = hl.querySelector('.sh');
+      sh.parentNode.insertBefore(card, sh.nextSibling);
+    }
+    card.innerHTML = (hasImg ? '<img src="' + src + '" alt="上次活動海報" loading="lazy">' : '') +
+      '<div class="ev-recap-body">' +
+        '<div class="ev-recap-k"><span class="i18n-zh">上次活動回顧</span><span class="i18n-en">Our last event</span></div>' +
+        '<h3 class="ev-recap-t">' + pick('event-title-main') + '</h3>' +
+        '<div class="ev-recap-d">' + pick('event-time-value') + '</div>' +
+        '<p class="ev-recap-p">' + pick('event-exp-value') + '</p>' +
+      '</div>';
   }
 
   // ---- 2) 商城入口：資料庫有上架商品才顯示 ----
