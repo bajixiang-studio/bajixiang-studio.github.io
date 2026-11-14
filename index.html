@@ -3588,6 +3588,24 @@ iframe.bjx-embed{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0
 .cc-list{margin:0;padding-left:1.1em}
 body .cc-list li{font-size:14.5px !important;line-height:1.7}
 .cc-acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+/* 精簡橫式課程卡（參考 inner988）：一列一堂，左圖右文；手機改成上圖下文 */
+.cc-grid{grid-template-columns:1fr !important;gap:22px !important;max-width:1000px;margin:0 auto}
+.cc{display:grid !important;grid-template-columns:minmax(0,36%) minmax(0,1fr);border-radius:14px;overflow:hidden;align-items:stretch}
+.cc .cc-media{aspect-ratio:auto;height:100%;min-height:260px}
+.cc .cc-media img{position:absolute;inset:0}  /* 圖片不撐高卡片，卡片高度由文字決定 */
+.cc .cc-body{padding:28px 34px;justify-content:center;gap:10px}
+.cc .cc-title{font-size:22px !important;line-height:1.45 !important}
+.cc-when{font-size:14px;color:var(--text-m);padding:6px 12px;border-left:2px solid var(--gold);background:rgba(201,168,76,.06);align-self:flex-start}
+body .cc .cc-summary{font-size:15.5px !important;-webkit-line-clamp:2;color:var(--text-c)}
+.cc .cc-more{border-radius:999px;padding:10px 26px;font-size:15px;letter-spacing:1.5px}
+@media (max-width:700px){
+  .cc{grid-template-columns:1fr}
+  .cc .cc-media{aspect-ratio:4/3;height:auto;min-height:0}
+  .cc .cc-media img{position:relative}
+  .cc .cc-body{padding:20px 20px 22px}
+  .cc .cc-title{font-size:19px !important}
+}
 .cc-line{display:inline-flex;align-items:center;min-height:42px;background:#06C755;color:#fff;text-decoration:none;font:14px 'Noto Serif TC',serif;letter-spacing:1.5px;padding:9px 18px;border-radius:2px}
 .cc-line:hover{filter:brightness(1.08)}
 .cc-btn-gold{background:var(--gold);border-color:var(--gold);color:var(--navy)}
@@ -7202,7 +7220,9 @@ document.addEventListener('keydown', function(e) {
     var sessions = Array.isArray(r.sessions) ? r.sessions : [];
     var dates = sessions.map(function (s) { return s.date; }).filter(Boolean);
     var times = sessions.map(function (s) { return s.time; }).filter(Boolean).filter(function (t, i, a) { return a.indexOf(t) === i; });
-    return { intro: intro, introEn: introEn, content: content.slice(0, 3).map(function (s) { return s.replace(/^[-•✦·\s]+/, ''); }),
+    // 卡片上的一句話小文案：一句話簡介 → 介紹第一行 → 原本的副標 → 適合對象
+    var teaser = clean(r.summary) || lines(r.description)[0] || lg.sub || lg.note || '';
+    return { intro: intro, introEn: introEn, teaser: teaser, content: content.slice(0, 3).map(function (s) { return s.replace(/^[-•✦·\s]+/, ''); }),
       contentMore: content.length > 3, dates: dates, times: times, sessions: sessions, fee: feeText(r) };
   }
 
@@ -7266,14 +7286,6 @@ document.addEventListener('keydown', function(e) {
     return dl;
   }
 
-  function lineButton(name) {
-    var a = el('a', 'cc-line');
-    a.href = LINE_URL; a.target = '_blank'; a.rel = 'noopener';
-    a.setAttribute('aria-label', 'LINE 洽詢：' + name + '（另開官方 LINE）');
-    a.appendChild(bi('span', '', 'LINE 洽詢', 'Ask on LINE'));
-    return a;
-  }
-
   function card(r) {
     var inf = info(r);
     var c = el('article', 'cc');
@@ -7286,6 +7298,7 @@ document.addEventListener('keydown', function(e) {
       var b = badge(r.status); if (b) media.appendChild(b);
       c.appendChild(media);
     }
+    // 卡片只放精簡資訊：分類、名稱、場次（有才顯示）、一句話小文案；完整內容在彈窗
     var body = el('div', 'cc-body');
     var lb = catLabel(r.category);
     body.appendChild(bi('div', 'cc-cat', lb[0], lb[1]));
@@ -7293,14 +7306,22 @@ document.addEventListener('keydown', function(e) {
     h.id = titleId;
     body.appendChild(h);
     if (!r.photo && !r.image_url) { var b2 = badge(r.status); if (b2) body.appendChild(b2); }
-    body.appendChild(infoList(r, inf, false));
+    if (inf.sessions.length) {
+      if (inf.sessions.length > 1) body.appendChild(bi('div', 'cc-sessions-label', inf.sessions.length + ' 個場次可選', inf.sessions.length + ' sessions available'));
+      var ul = el('ul', 'cc-sessions');
+      inf.sessions.slice(0, 3).forEach(function (s) { ul.appendChild(sessionLine(s)); });
+      body.appendChild(ul);
+      if (inf.sessions.length > 3) body.appendChild(bi('div', 'cc-sessions-more', '還有 ' + (inf.sessions.length - 3) + ' 個場次，點開看全部', (inf.sessions.length - 3) + ' more — open for all dates'));
+    } else {
+      body.appendChild(bi('div', 'cc-when', '開課資訊請洽官方 LINE', 'Ask us on LINE for schedule'));
+    }
+    if (inf.teaser) body.appendChild(bi('p', 'cc-summary', inf.teaser, inf.introEn));
     var acts = el('div', 'cc-acts');
-    var more = bi('button', 'cc-more', '查看詳情', 'View details');
+    var more = bi('button', 'cc-more', r.isPlan ? '查看方案內容與費用' : '查看課程介紹與費用', r.isPlan ? 'Plan details & fees' : 'Details & fees');
     more.type = 'button';
     more.setAttribute('aria-haspopup', 'dialog');
     more.addEventListener('click', function () { openDetail(r, more); });
     acts.appendChild(more);
-    acts.appendChild(lineButton(r.name));
     body.appendChild(acts);
     c.appendChild(body);
     // 點卡片任何地方都會打開詳情（LINE 連結與按鈕照原本的功能）；鍵盤使用者用「查看詳情」按鈕
