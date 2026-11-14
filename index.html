@@ -7341,9 +7341,8 @@ document.addEventListener('keydown', function(e) {
       inf.sessions.slice(0, 3).forEach(function (s) { ul.appendChild(sessionLine(s)); });
       body.appendChild(ul);
       if (inf.sessions.length > 3) body.appendChild(bi('div', 'cc-sessions-more', '還有 ' + (inf.sessions.length - 3) + ' 個場次，點開看全部', (inf.sessions.length - 3) + ' more — open for all dates'));
-    } else {
-      body.appendChild(bi('div', 'cc-when', '開課資訊請洽官方 LINE', 'Ask us on LINE for schedule'));
     }
+    // 沒有場次時卡片不放「請洽 LINE」字樣（每張都一樣太重複），彈窗裡的開課日期／時間欄位與 LINE 洽詢按鈕仍會說明
     if (inf.teaser) body.appendChild(bi('p', 'cc-summary', inf.teaser, inf.introEn));
     var acts = el('div', 'cc-acts');
     var more = bi('button', 'cc-more', r.isPlan ? '查看方案內容與費用' : '查看課程介紹與費用', r.isPlan ? 'Plan details & fees' : 'Details & fees');
