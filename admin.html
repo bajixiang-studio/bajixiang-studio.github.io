@@ -823,6 +823,10 @@
     var rows = result.data.slice();
     var have = {};
     rows.forEach(function(row){ have[row.key] = true; });
+    // 活動區的可選欄位：資料庫還沒有也先列出來（空白＝網站不顯示）
+    EVENT_OPTIONAL_KEYS.forEach(function(k){
+      if (!have[k]) { rows.push({ key: k, value: '' }); have[k] = true; }
+    });
     CONTENT_KEYS_WITH_EN.forEach(function(k){
       if (have[k] && !have[k + '_en']) rows.push({ key: k + '_en', value: '' });
     });
@@ -831,14 +835,31 @@
       list.appendChild(renderContentCard(row.key, row.value));
     });
   }
-  var CONTENT_KEYS_WITH_EN = ['event_title', 'event_title_sub', 'event_time', 'event_exp_title', 'event_exp_sub', 'cta_sub', 'hb_title', 'hb_subtitle', 'hb_intro'];
+  var EVENT_OPTIONAL_KEYS = ['event_tag', 'event_location', 'event_free_note', 'event_host', 'event_role', 'event_register_url'];
+  var CONTENT_KEYS_WITH_EN = ['event_title', 'event_title_sub', 'event_time', 'event_exp_title', 'event_exp_sub', 'cta_sub', 'hb_title', 'hb_subtitle', 'hb_intro',
+    'event_tag', 'event_location', 'event_free_note', 'event_host', 'event_role'];
+  // 欄位的中文說明（顯示在欄位名稱旁）
+  var CONTENT_LABELS = {
+    event_title: '活動標題',
+    event_title_sub: '活動副標題',
+    event_time: '活動時間（請寫成 2026年12月27日 這種格式，日期過了網站會自動改成「活動回顧」）',
+    event_exp_title: '活動說明標題',
+    event_exp_sub: '活動說明內容',
+    event_tag: '活動標籤（例：Free Event、限額報名、公益活動；留空不顯示）',
+    event_location: '活動地點（留空不顯示）',
+    event_free_note: '費用／參加方式（例：個人參加證 HK$680；留空不顯示）',
+    event_host: '主辦單位（例：愛孩子慈善基金會；留空則只顯示八吉祥的角色）',
+    event_role: '八吉祥角色（例：報名窗口、協辦單位、主辦單位、帶團參加）',
+    event_register_url: '報名連結（LINE 或 Google 表單網址；LINE 連結會顯示「LINE 報名」按鈕）'
+  };
 
   function renderContentCard(key, value){
     var card = document.createElement('div');
     card.className = 'card';
     var isEn = key.slice(-3) === '_en';
+    var label = CONTENT_LABELS[isEn ? key.slice(0, -3) : key];
     card.innerHTML =
-      '<div class="card-key">' + key + (isEn ? '　<span style="opacity:.7">（英文版：網站切換到 EN 時顯示，留空就顯示中文）</span>' : '') + '</div>' +
+      '<div class="card-key">' + key + (label ? '　<b>' + label + '</b>' : '') + (isEn ? '　<span style="opacity:.7">（英文版：網站切換到 EN 時顯示，留空就顯示中文）</span>' : '') + '</div>' +
       '<textarea>' + (value || '').replace(/</g,'&lt;') + '</textarea>' +
       '<div class="card-actions"><span class="msg" style="margin-right:12px"></span><button class="btn">儲存</button></div>';
     var textarea = card.querySelector('textarea');

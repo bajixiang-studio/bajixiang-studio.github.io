@@ -3597,6 +3597,8 @@ iframe.bjx-embed{display:block;width:100%;aspect-ratio:16/9;height:auto;border:0
 
 /* ===== 課程方案：分類篩選＋課程卡 ===== */
 #pricing.cc-ready .plan-series,#pricing.cc-ready #extra-courses-container{display:none !important}
+#travel.tr-ready .travel-card-wrap,#travel.tr-ready #travel-upcoming-heading,#travel.tr-ready #travel-past-heading{display:none !important}
+#travel .tr-wrap{margin-top:8px}
 .cc-wrap{letter-spacing:.5px}  /* 原本 #pricing 整區有 6px 字距，卡片不要繼承 */
 /* 分類按鈕列在收合區最上面，收合區會裁掉超出的部分，所以不能用負邊距，上方留一點空間 */
 .cc-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:0 0 30px;padding-top:3px}
@@ -7147,12 +7149,19 @@ document.addEventListener('keydown', function(e) {
   var SUPABASE_KEY = "sb_publishable_2LJUwfRcENwZrRoTDiebdA_G8BYzjIP";
   var LINE_URL = "https://lin.ee/Q8XKTw6";
   var PLAN_CAT = "會員專屬方案";
-  var STATUS_EN = { "招生中": "Open", "即將開課": "Coming Soon", "隨時預約": "By Appointment", "已額滿": "Full", "已結束": "Ended" };
-  var STATUS_CLS = { "招生中": "open", "即將開課": "soon", "隨時預約": "appt", "已額滿": "full", "已結束": "ended" };
+  var STATUS_EN = { "招生中": "Open", "即將開課": "Coming Soon", "隨時預約": "By Appointment", "已額滿": "Full", "已結束": "Ended", "即將出發": "Upcoming", "曾經舉辦": "Past Trip" };
+  var STATUS_CLS = { "招生中": "open", "即將開課": "soon", "隨時預約": "appt", "已額滿": "full", "已結束": "ended", "即將出發": "open", "曾經舉辦": "ended" };
+  // 課程卡的欄位名稱；療癒旅行共用同一套卡片，只換欄位名稱（r.labels）
+  var LABELS = {
+    intro: ['課程介紹／適合對象', 'About / Who it’s for'], content: ['課程內容', 'What’s included'],
+    dates: ['開課日期', 'Dates'], time: ['上課時間', 'Time'], fee: ['費用', 'Fee'],
+    more: ['查看課程介紹與費用', 'Details & fees'], desc: ['課程介紹', 'About this course'], photo: ' 課程照片'
+  };
   // 後台分類 → 首頁顯示的分類名稱與順序；沒列到的分類照原名排在後面
   var CAT_LABEL = {
     "體驗入門系列": ["體驗入門", "Beginner"], "完整療癒系列": ["完整療癒", "Full Program"], "會員專屬方案": ["會員方案", "Membership"],
-    "深度療癒系列": ["個人療癒", "Private Sessions"], "專業培訓系列": ["專業培訓", "Training"], "團體紓壓方案": ["團體紓壓", "Groups"]
+    "深度療癒系列": ["個人療癒", "Private Sessions"], "專業培訓系列": ["專業培訓", "Training"], "團體紓壓方案": ["團體紓壓", "Groups"],
+    "療癒旅行": ["療癒旅行", "Healing Journey"]
   };
   var CAT_ORDER = ["體驗入門系列", "完整療癒系列", "會員專屬方案", "深度療癒系列", "專業培訓系列", "團體紓壓方案"];
   // 課程照片：放在 images/courses/ 的本地照片優先使用；檔案還沒放入時，沿用後台圖片或原本的海報
@@ -7306,26 +7315,30 @@ document.addEventListener('keydown', function(e) {
   }
   function feeOriginal(r) { var p = clean(r.price_note); return p && !/^洽詢$/.test(p) ? p : ''; }
 
+  function lab(r, k) { return (r.labels && r.labels[k]) || LABELS[k]; }
   function infoList(r, inf, full) {
     var dl = el('dl', 'cc-info');
-    row(dl, ['課程介紹／適合對象', 'About / Who it’s for'], inf.intro ? bi('span', '', inf.intro, inf.introEn) : null, TXT.ask);
+    var skip = r.skipRows || [];  // 例如已舉辦過的旅行不顯示日期／費用的洽詢字樣
+    row(dl, lab(r, 'intro'), inf.intro ? bi('span', '', inf.intro, inf.introEn) : null, TXT.ask);
     var content = null;
     if (inf.content.length) {
       content = el('ul', 'cc-list');
       inf.content.forEach(function (c) { content.appendChild(el('li', '', c)); });
     }
-    row(dl, ['課程內容', 'What’s included'], content, TXT.ask);
-    if (full && inf.sessions.length) {
-      var ul = el('ul', 'cc-sessions');
-      inf.sessions.forEach(function (s) { ul.appendChild(sessionLine(s)); });
-      row(dl, ['開課日期', 'Dates'], ul, TXT.date);
-    } else {
-      var d = inf.dates.length ? inf.dates.slice(0, 2).join('、') + (inf.dates.length > 2 ? ' 等 ' + inf.dates.length + ' 場' : '') : '';
-      row(dl, ['開課日期', 'Dates'], d, TXT.date);
+    row(dl, lab(r, 'content'), content, TXT.ask);
+    if (skip.indexOf('dates') < 0) {
+      if (full && inf.sessions.length) {
+        var ul = el('ul', 'cc-sessions');
+        inf.sessions.forEach(function (s) { ul.appendChild(sessionLine(s)); });
+        row(dl, lab(r, 'dates'), ul, TXT.date);
+      } else {
+        var d = inf.dates.length ? inf.dates.slice(0, 2).join('、') + (inf.dates.length > 2 ? ' 等 ' + inf.dates.length + ' 場' : '') : '';
+        row(dl, lab(r, 'dates'), d, TXT.date);
+      }
     }
     // 只顯示後台場次裡實際填寫的時間；「時數」欄位目前混有人數等內容，不拿來當上課時間
-    row(dl, ['上課時間', 'Time'], inf.times.join('、'), TXT.time);
-    row(dl, ['費用', 'Fee'], feeNode(r, inf), TXT.fee);
+    if (skip.indexOf('time') < 0) row(dl, lab(r, 'time'), inf.times.join('、'), TXT.time);
+    if (skip.indexOf('fee') < 0) row(dl, lab(r, 'fee'), feeNode(r, inf), TXT.fee);
     return dl;
   }
 
@@ -7359,7 +7372,8 @@ document.addEventListener('keydown', function(e) {
     // 沒有場次時卡片不放「請洽 LINE」字樣（每張都一樣太重複），彈窗裡的開課日期／時間欄位與 LINE 洽詢按鈕仍會說明
     if (inf.teaser) body.appendChild(bi('p', 'cc-summary', inf.teaser, inf.introEn));
     var acts = el('div', 'cc-acts');
-    var more = bi('button', 'cc-more', r.isPlan ? '查看方案內容與費用' : '查看課程介紹與費用', r.isPlan ? 'Plan details & fees' : 'Details & fees');
+    var ml = r.isPlan ? ['查看方案內容與費用', 'Plan details & fees'] : lab(r, 'more');
+    var more = bi('button', 'cc-more', ml[0], ml[1]);
     more.type = 'button';
     more.setAttribute('aria-haspopup', 'dialog');
     more.addEventListener('click', function () { openDetail(r, more); });
@@ -7427,7 +7441,7 @@ document.addEventListener('keydown', function(e) {
       acts.appendChild(go);
     }
     var line = el('a', 'cc-btn cc-btn-main');
-    line.href = LINE_URL; line.target = '_blank'; line.rel = 'noopener';
+    line.href = r.line_link || LINE_URL; line.target = '_blank'; line.rel = 'noopener';
     line.appendChild(bi('span', '', 'LINE 洽詢', 'Ask on LINE'));
     acts.appendChild(line);
     box2.appendChild(acts);
@@ -7437,7 +7451,8 @@ document.addEventListener('keydown', function(e) {
     var desc = lines(r.description), descEn = lines(r.description_en);
     if (desc.length) {
       var sec = el('div', 'cc-m-sec');
-      sec.appendChild(bi('h4', 'cc-m-h', '課程介紹', 'About this course'));
+      var dh = lab(r, 'desc');
+      sec.appendChild(bi('h4', 'cc-m-h', dh[0], dh[1]));
       sec.appendChild(bi('p', 'cc-m-p cc-pre', desc.join('\n'), descEn.join('\n')));
       modalBody.appendChild(sec);
     }
@@ -7545,7 +7560,84 @@ document.addEventListener('keydown', function(e) {
     }
   }
 
+  // 給「療癒旅行」等其他區塊共用同一套卡片與彈窗
+  window.bjxCourseKit = { card: card, openDetail: openDetail, el: el, bi: bi, clean: clean, lines: lines };
+
   document.addEventListener('DOMContentLoaded', function () { load().catch(function (e) { console.error('課程載入失敗：', e); }); });
+})();
+</script>
+<script id="bjx-travels-js">
+/* 療癒旅行：改用和課程一樣的精簡卡片，點開看完整行程（資料來自後台「療癒旅行」）
+   沒填的日期、費用一律顯示洽詢字樣，不自行補資料 */
+(function () {
+  var SUPABASE_URL = "https://vmwwmowgijcskcrajmzg.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_2LJUwfRcENwZrRoTDiebdA_G8BYzjIP";
+  var LABELS = {
+    intro: ['行程介紹／適合對象', 'About / Who it’s for'], content: ['行程內容', 'Itinerary'],
+    dates: ['出發日期', 'Departure'], fee: ['費用', 'Fee'],
+    more: ['查看行程介紹', 'Trip details'], desc: ['行程介紹', 'About this trip']
+  };
+
+  // 原本寫在網頁裡的「療癒旅行規畫」介紹（客製化行程），當作第一張卡
+  function overview() {
+    var m = document.getElementById('modal-travel-overview');
+    if (!m) return null;
+    var sections = [];
+    m.querySelectorAll('.modal-section').forEach(function (s) {
+      var h = s.querySelector('.modal-section-title');
+      sections.push({ title: h ? h.textContent.trim() : '', items: Array.prototype.map.call(s.querySelectorAll('li'), function (li) { return li.textContent.trim(); }) });
+    });
+    var sub = m.querySelector('.modal-sub'), img = m.querySelector('.modal-img');
+    var who = sections.filter(function (s) { return /適合/.test(s.title); })[0];
+    return {
+      id: 'overview', name: '客製化療癒旅行規劃', name_en: 'Custom Healing Journeys', category: '療癒旅行',
+      status: '隨時預約',
+      summary: sub ? sub.textContent.trim() : '', summary_en: 'Turn travel into a journey that resets body, mind and spirit.',
+      image_url: img ? img.getAttribute('src') : '',
+      legacy: { el: m, sections: sections, sub: sub ? sub.textContent.trim() : '', note: who ? who.items.join('\n') : '' },
+      labels: LABELS, skipRows: ['time', 'dates']  // 客製化行程隨時預約，沒有固定出發日
+    };
+  }
+
+  function fromDb(t) {
+    var past = t.status === 'past';
+    return {
+      id: t.id, name: t.title, name_en: t.title_en, category: '療癒旅行',
+      status: past ? '曾經舉辦' : '即將出發',
+      summary: t.subtitle, summary_en: t.subtitle_en,
+      description: t.description, description_en: t.description_en,
+      features_text: t.features_text, features_text_en: t.features_text_en,
+      image_url: t.image_url, line_link: t.line_link,
+      labels: LABELS, skipRows: past ? ['dates', 'time', 'fee'] : ['time']
+    };
+  }
+
+  async function load() {
+    var kit = window.bjxCourseKit, sec = document.getElementById('travel');
+    if (!kit || !sec) return;
+    var rows = [], ov = overview();
+    if (ov) rows.push(ov);
+    if (window.supabase) {
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      var r = await sb.from('travels').select('id,title,title_en,subtitle,subtitle_en,image_url,description,description_en,features_text,features_text_en,status,line_link,sort_order').order('sort_order');
+      if (!r.error) {
+        var list = r.data || [];
+        // 即將出發的排前面，曾經舉辦的排後面
+        rows = rows.concat(list.filter(function (t) { return t.status !== 'past'; }).map(fromDb), list.filter(function (t) { return t.status === 'past'; }).map(fromDb));
+      }
+    }
+    if (!rows.length) return;
+    var wrap = kit.el('div', 'cc-wrap tr-wrap');
+    var grid = kit.el('div', 'cc-grid');
+    rows.forEach(function (t) { grid.appendChild(kit.card(t)); });
+    wrap.appendChild(grid);
+    var fold = sec.querySelector('.bjx-fold');
+    if (fold) fold.insertBefore(wrap, fold.firstChild);
+    else { var sh = sec.querySelector('.sh'); sh.parentNode.insertBefore(wrap, sh.nextSibling); }
+    sec.classList.add('tr-ready');  // 隱藏原本的旅行海報卡
+  }
+
+  document.addEventListener('DOMContentLoaded', function () { load().catch(function (e) { console.error('療癒旅行載入失敗：', e); }); });
 })();
 </script>
 <script id="bjx-site-js">
@@ -7616,6 +7708,83 @@ document.addEventListener('keydown', function(e) {
       '</div>';
   }
 
+  // ---- 1b) 活動區可由後台「內容編輯」填寫的欄位：標籤、地點、費用、主辦、八吉祥角色；報名按鈕依連結種類顯示 ----
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function bilingual(zh, en) {
+    return '<span class="i18n-zh">' + esc(zh).replace(/\n/g, '<br>') + '</span><span class="i18n-en">' + esc((en && en.trim()) ? en : zh).replace(/\n/g, '<br>') + '</span>';
+  }
+  function detail(icon, labelZh, labelEn, valueHtml, subHtml, cls) {
+    var d = document.createElement('div');
+    d.className = 'event-detail ' + (cls || '');
+    d.innerHTML = '<div class="event-detail-icon">' + icon + '</div><div><div class="event-dl">' + bilingual(labelZh, labelEn) + '</div>' +
+      '<div class="event-dv">' + valueHtml + '</div>' + (subHtml ? '<div class="event-ds">' + subHtml + '</div>' : '') + '</div>';
+    return d;
+  }
+  function applyEventFields(v) {
+    var sec = document.getElementById('event');
+    if (!sec) return;
+    var val = function (k) { return (v[k] || '').trim(); };
+    // 標籤（例如 Free Event、限額報名）：留空就不顯示
+    var tag = sec.querySelector('.event-tag');
+    // （這些元素原本有 display 樣式，hidden 屬性蓋不過，所以直接設 style.display）
+    // 後台還沒建立這個欄位時維持網頁原本的內容；建立了但留空才隱藏
+    var set = function (k) { return Object.prototype.hasOwnProperty.call(v, k); };
+    if (tag && set('event_tag')) { tag.style.display = val('event_tag') ? '' : 'none'; if (val('event_tag')) tag.innerHTML = bilingual(val('event_tag'), val('event_tag_en')); }
+    // 費用／參加方式：留空就不顯示
+    var fee = sec.querySelector('.event-free');
+    if (fee && set('event_free_note')) { fee.style.display = val('event_free_note') ? '' : 'none'; if (val('event_free_note')) fee.innerHTML = bilingual(val('event_free_note'), val('event_free_note_en')); }
+    var details = sec.querySelector('.event-details');
+    if (details) {
+      // 地點：接在活動時間後面
+      var loc = details.querySelector('.ev-loc');
+      if (loc) loc.remove();
+      if (val('event_location')) {
+        loc = detail('📍', '活動地點', 'Location', bilingual(val('event_location'), val('event_location_en')), '', 'ev-loc');
+        var first = details.querySelector('.event-detail');
+        details.insertBefore(loc, first ? first.nextSibling : null);
+      }
+      // 主辦單位與八吉祥的角色（報名窗口／協辦單位／主辦單位／帶團參加）
+      var old = details.querySelectorAll('.event-detail:not(.ev-loc)');
+      var hostRow = old[old.length - 1];
+      var newHost = details.querySelector('.ev-host');
+      if (newHost) newHost.remove();
+      var host = val('event_host'), role = val('event_role');
+      // 原本寫死「主辦：八吉祥音樂工作室」的那一列：有填主辦或角色才換掉
+      if (hostRow) hostRow.style.display = (host || role) ? 'none' : '';
+      if (host || role) {
+        var roleHtml = role ? bilingual('八吉祥音樂工作室・' + role, 'Eight Auspicious Music Studio · ' + (val('event_role_en') || role)) : '';
+        details.appendChild(host
+          ? detail('🎵', '主辦單位', 'Organizer', bilingual(host, val('event_host_en')), roleHtml, 'ev-host')
+          : detail('🎵', '八吉祥', 'Eight Auspicious', bilingual(role, val('event_role_en')), '', 'ev-host'));
+      }
+    }
+    // 報名按鈕：LINE 連結顯示「LINE 報名」，Google 表單維持「立即報名」
+    var link = document.getElementById('event-register-link');
+    var url = val('event_register_url') || (link && link.getAttribute('href')) || '';
+    if (link) {
+      var isLine = /lin\.ee|line\.me/i.test(url);
+      var isForm = /docs\.google\.com\/forms|forms\.gle/i.test(url);
+      link.innerHTML = isLine ? bilingual('LINE 報名', 'Register via LINE') : bilingual('立即報名', 'Register Now');
+      link.classList.toggle('ev-line-btn', isLine);
+      var noteEl = link.parentNode.querySelector('p');
+      if (noteEl) noteEl.innerHTML = isLine ? bilingual('點擊後將開啟八吉祥官方 LINE 報名', 'Opens our official LINE to register')
+        : isForm ? bilingual('點擊後將開啟 Google 表單' + '頁面進行報名', 'Opens a Google Form to register')
+        : bilingual('點擊後將開啟報名頁面', 'Opens the registration page');
+    }
+    tighten(sec);
+  }
+  window.bjxPreviewEvent = function (v) { applyEventFields(v); setEventState(); };  // 方便預覽測試
+  async function loadEventFields() {
+    if (!window.supabase) return;
+    var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    var r = await sb.from('site_content').select('key,value').like('key', 'event_%');
+    if (r.error) return;
+    var v = {};
+    (r.data || []).forEach(function (row) { v[row.key] = row.value || ''; });
+    applyEventFields(v);
+    setEventState();
+  }
+
   // ---- 2) 商城入口：資料庫有上架商品才顯示 ----
   async function checkProducts() {
     if (!window.supabase) return;
@@ -7643,6 +7812,7 @@ document.addEventListener('keydown', function(e) {
     window.addEventListener('load', function () { tighten(); setEventState(); });
     setTimeout(function () { tighten(); }, 2500);
     checkProducts().catch(function () {});
+    loadEventFields().catch(function () {});
   });
 })();
 </script>
