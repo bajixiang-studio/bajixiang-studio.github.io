@@ -3613,6 +3613,7 @@ body .cc-list li{font-size:14.5px !important;line-height:1.7}
 /* 精簡橫式課程卡（參考 inner988）：一列一堂，左圖右文；手機改成上圖下文 */
 .cc-grid{grid-template-columns:1fr !important;gap:22px !important;max-width:1000px;margin:0 auto}
 .cc{display:grid !important;grid-template-columns:minmax(0,36%) minmax(0,1fr);border-radius:14px;overflow:hidden;align-items:stretch}
+.cc[hidden]{display:none !important}  /* 分類篩選靠 hidden 隱藏卡片，必須蓋過上面的 display:grid !important */
 .cc .cc-media{aspect-ratio:auto;height:100%;min-height:260px}
 .cc .cc-media img{position:absolute;inset:0}  /* 圖片不撐高卡片，卡片高度由文字決定 */
 .cc .cc-body{padding:28px 34px;justify-content:center;gap:10px}
