@@ -3453,6 +3453,16 @@ nav,nav.scrolled{background:rgba(11,31,58,.94) !important;backdrop-filter:blur(1
 .qk-d{font-size:15px;line-height:1.7;color:var(--text-c)}
 .qk-go{margin-top:auto;padding-top:8px;font-size:14.5px;color:var(--gold-l);letter-spacing:1px}
 .qk-main{border-color:rgba(201,168,76,.6);background:rgba(201,168,76,.1)}
+.qk[hidden]{display:none !important}
+/* 電腦版：所有入口排成一列（4 或 5 個都平均分配） */
+@media (min-width:900px){
+  .qk-grid{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:14px}
+  .qk{padding:20px 16px 18px}
+  .qk-medal{width:58px;height:58px}.qk-medal svg{width:30px;height:30px}
+  .qk-t{font-size:18px;letter-spacing:1px}
+  .qk-d{font-size:14px}
+  .qk-go{font-size:14px}
+}
 @media (max-width:600px){.qk-grid{grid-template-columns:1fr 1fr;gap:10px}.qk{padding:16px 14px}.qk-t{font-size:17px}.qk-d{font-size:13.5px}.qk-medal{width:54px;height:54px}.qk-medal svg{width:28px;height:28px}}
 
 /* 活動已結束：改成活動回顧 */
@@ -3536,6 +3546,8 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 /* 最新消息輪播：軌道不能置中，否則第一張會超出左邊、捲不到，兩張都只露一半 */
 #latest-events-gallery.bjx-carousel{justify-content:flex-start !important}
 #latest-events-gallery .extra-gallery-item{display:flex;justify-content:center;align-items:center}
+/* 只有 2 張時並排（不輪播），手機寬度太窄就上下排 */
+#latest-events-gallery:not(.bjx-carousel):has(> :nth-child(2)){max-width:1000px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px;align-items:start}
 /* 長海報整張都看得到：高度最多約一個螢幕，寬度依比例縮 */
 #latest-events-gallery .extra-gallery-frame{display:flex;justify-content:center;width:100%}
 #latest-events-gallery .extra-gallery-img{width:auto !important;max-width:100%;max-height:min(78vh,820px);height:auto !important;margin:0 auto;display:block}
@@ -3964,7 +3976,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
       <a class="qk" href="#event">
         <span class="qk-medal" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M12 11.6l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z"/></svg></span>
         <span class="qk-t"><span class="i18n-zh">近期活動</span><span class="i18n-en">Events</span></span>
-        <span class="qk-d"><span class="i18n-zh">公益音樂下午茶與活動消息</span><span class="i18n-en">Charity music afternoons and event news</span></span>
+        <span class="qk-d"><span class="i18n-zh">公益活動、國際交流與活動消息</span><span class="i18n-en">Charity events, global gatherings and news</span></span>
         <span class="qk-go"><span class="i18n-zh">查看活動</span><span class="i18n-en">View events</span> →</span>
       </a>
       <a class="qk" href="#travel">
@@ -6941,7 +6953,7 @@ document.addEventListener('keydown', function(e) {
     if (le) {
       var tryLE = function () {
         if (le._bjxCar) return;
-        if (le.children.length >= 2) { le.classList.add('bjx-carousel'); initCarousel(le, { wrapClass: 'bjx-car--latest', interval: 5200 }); }
+        if (le.children.length >= 3) { le.classList.add('bjx-carousel'); initCarousel(le, { wrapClass: 'bjx-car--latest', interval: 5200 }); }
       };
       tryLE();
       if (!le._bjxCar && 'MutationObserver' in window) {
