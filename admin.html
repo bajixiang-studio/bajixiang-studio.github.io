@@ -104,6 +104,8 @@
   .course-item.open .course-body{display:block}
   .course-body .photo-card{margin:0;border:0}
   @media(max-width:640px){.course-head{flex-wrap:wrap}.course-head-acts{width:100%;justify-content:flex-start}.course-body .photo-card{flex-direction:column}}
+/* 相片上傳不需要說明文字：隱藏各區的「說明文字（選填）」欄位 */
+.field:has(> [id^="newGalleryCaption-"]){display:none}
 </style>
 </head>
 <body>
@@ -509,6 +511,12 @@
         </div>
         <button class="btn" id="addTravelPastBtn">新增「曾經舉辦」行程</button>
         <span class="msg" id="travelPastAddMsg" style="margin-left:12px"></span>
+      </div>
+
+      <div id="travelImportBox" class="add-photo-box" style="display:none">
+        <div class="sub" style="margin-bottom:10px">網站上的「客製化療癒旅行規劃」（療癒系旅遊行程海報）目前是網頁內建的，後台改不到。<br>按下面的按鈕，會把它原封不動地複製成後台的一筆行程（狀態：隨時預約），之後就能在下方修改文字和圖片。</div>
+        <button class="btn" id="travelImportBtn">把「客製化療癒旅行規劃」加入後台</button>
+        <span class="msg" id="travelImportMsg" style="margin-left:12px"></span>
       </div>
 
       <div class="sub-h">目前旅行行程</div>
@@ -1094,6 +1102,8 @@
     var cache = galleryCache[category];
     var card = document.createElement('div');
     card.className = 'photo-card';
+    // 相片不再需要說明文字；只有舊資料已經有說明時才顯示欄位，方便清空移除
+    var hasCaption = !!(row.caption && row.caption.trim());
     card.innerHTML =
       (row.media_type === 'embed'
         ? '<a href="' + escAttr(row.url) + '" target="_blank" rel="noopener" style="width:120px;height:80px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--gold-d);color:var(--gold-l);font-size:13px;text-decoration:none">▶ 影片連結</a>'
@@ -1101,10 +1111,13 @@
         ? '<video src="' + row.url + '" muted controls style="width:100%;display:block;max-height:160px;object-fit:cover"></video>'
         : '<img src="' + row.url + '">') +
       '<div class="photo-card-body">' +
-        '<div class="photo-card-key">' + (row.media_type === 'embed' ? '影片網址：' + escHtml(row.url) : row.media_type === 'video' ? '影片說明' : '照片說明') + '</div>' +
-        '<input type="text" value="' + (row.caption || '').replace(/"/g,'&quot;') + '" placeholder="說明文字">' +
+        (row.media_type === 'embed' ? '<div class="photo-card-key">影片網址：' + escHtml(row.url) + '</div>' : '') +
+        (hasCaption
+          ? '<div class="photo-card-key">舊的說明文字（清空後按「儲存」即可移除）</div>' +
+            '<input type="text" value="' + (row.caption || '').replace(/"/g,'&quot;') + '">'
+          : '') +
         '<div class="photo-card-actions">' +
-          '<button class="btn-small save">儲存說明</button>' +
+          (hasCaption ? '<button class="btn-small save">儲存</button>' : '') +
           '<button class="btn-small up"' + (idx === 0 ? ' disabled' : '') + '>上移</button>' +
           '<button class="btn-small down"' + (idx === cache.length - 1 ? ' disabled' : '') + '>下移</button>' +
           '<button class="btn-small btn-danger del">刪除</button>' +
@@ -1114,8 +1127,8 @@
     var captionInput = card.querySelector('input[type=text]');
     var msg = card.querySelector('.msg');
 
-    card.querySelector('.save').addEventListener('click', async function(){
-      var result = await sb.from('gallery_images').update({ caption: captionInput.value }).eq('id', row.id);
+    if (hasCaption) card.querySelector('.save').addEventListener('click', async function(){
+      var result = await sb.from('gallery_images').update({ caption: captionInput.value.trim() || null }).eq('id', row.id);
       msg.textContent = result.error ? '儲存失敗' : '已儲存';
       msg.className = result.error ? 'msg err' : 'msg ok';
       setTimeout(function(){ msg.textContent=''; }, 2000);
@@ -2119,6 +2132,8 @@
       return;
     }
     travelsCache = result.data || [];
+    var importBox = document.getElementById('travelImportBox');
+    if (importBox) importBox.style.display = travelsCache.some(function(r){ return r.status === 'anytime'; }) ? 'none' : '';
     list.innerHTML = '';
     if (!travelsCache.length) {
       list.innerHTML = '<div class="empty">尚未新增任何行程</div>';
@@ -2138,7 +2153,36 @@
     });
   }
 
-  var TRAVEL_V2_COLS = ['travel_date', 'travel_date_en', 'price_note', 'price_note_en'];
+  // 把網頁內建的「客製化療癒旅行規劃」複製成後台資料（內容與原本網頁上的完全相同）
+  document.getElementById('travelImportBtn').addEventListener('click', async function(){
+    var btn = this, msg = document.getElementById('travelImportMsg');
+    btn.disabled = true; msg.textContent = '加入中...'; msg.className = 'msg';
+    var minOrder = travelsCache.length ? Math.min.apply(null, travelsCache.map(function(r){ return r.sort_order || 0; })) : 0;
+    var result = await sb.from('travels').insert([{
+      status: 'anytime',
+      title: '客製化療癒旅行規劃',
+      title_en: 'Custom Healing Journeys',
+      subtitle: '把旅行變成一場身心靈重啟之旅',
+      subtitle_en: 'Turn travel into a journey that resets body, mind and spirit.',
+      image_url: 'images/travel/custom-healing-journey.jpg',
+      description: '行程特色\n🌿 自然療癒 · 走進山海綠意，感受大地能量\n🎵 頌缽冥想 · 透過聲音頻率，釋放壓力與雜念\n🌸 芳療放鬆 · 天然精油呵護，舒緩身心疲憊\n🗺️ 深度旅程體驗 · 在地文化 × 療癒行程，豐富心靈感受\n\n適合對象\n✦ 想在旅途中找回平衡與靈感的你\n✦ 希望旅行不只是觀光，而是身心靈深度體驗\n✦ 渴望走進自然，重新連結內在力量',
+      features_text: '客製化療癒旅遊行程規劃\n國內外聖地療癒之旅（台灣東部、花東、日本等）\n每日頌缽晨間冥想與能量淨化\n在地文化體驗與療癒工作坊\n專業療癒師全程陪同引導',
+      line_link: 'https://lin.ee/Q8XKTw6',
+      sort_order: minOrder - 1
+    }]);
+    btn.disabled = false;
+    if (result.error) {
+      msg.className = 'msg err';
+      msg.textContent = /check|constraint|status/i.test(result.error.message)
+        ? '加入失敗：請先在 Supabase 執行 supabase_schema_travels_v2.sql（開放「隨時預約」狀態），再按一次'
+        : '加入失敗：' + result.error.message;
+      return;
+    }
+    msg.textContent = '已加入，網站上的這張卡片現在改由後台控制'; msg.className = 'msg ok';
+    loadTravelsAdmin();
+  });
+
+  var TRAVEL_V2_COLS =['travel_date', 'travel_date_en', 'price_note', 'price_note_en'];
   var travelV2 = false;
   function travelV2Fields(row){
     if (!travelV2) return '<div class="field" style="margin-top:8px;opacity:.75;font-size:13px">（出發日期、費用欄位尚未啟用：請先在 Supabase 執行 supabase_schema_travels_v2.sql）</div>';
