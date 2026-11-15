@@ -3516,6 +3516,14 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 /* 費用改用一般字體，金額才看得清楚 */
 .event-free{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
   font-size:19px !important;letter-spacing:1px !important;font-weight:600;padding:12px 24px !important;white-space:normal !important}
+/* 海報欄加寬（原本約 413px），點海報可放大看細節 */
+@media (min-width:900px){
+  #event .event-hero{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) !important;gap:40px !important}
+}
+#event-main-image{cursor:zoom-in;width:100%}
+.ev-zoom{position:fixed;inset:0;z-index:10050;background:rgba(5,14,28,.92);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.ev-zoom img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.ev-zoom button{position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(201,168,76,.6);background:rgba(11,31,58,.8);color:#F5E6B8;font-size:20px;cursor:pointer}
 #event-register-link{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
   font-size:17px !important;letter-spacing:3px !important;font-weight:600}
 @media (max-width:640px){
@@ -7834,7 +7842,28 @@ document.addEventListener('keydown', function(e) {
     });
   }
 
+  // 點活動海報：全螢幕放大，方便看清楚海報上的小字
+  function zoomPoster(img) {
+    var src = img.currentSrc || img.src;
+    if (!src || src.indexOf('data:image/gif') === 0) return;
+    var box = document.createElement('div');
+    box.className = 'ev-zoom';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-label', '活動海報放大檢視');
+    box.innerHTML = '<img alt="' + esc(img.alt || '活動海報') + '"><button type="button" aria-label="關閉">✕</button>';
+    box.querySelector('img').src = src;
+    function close() { box.remove(); document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    box.addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(box);
+    document.body.style.overflow = 'hidden';
+    box.querySelector('button').focus();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    var poster = document.getElementById('event-main-image');
+    if (poster) poster.addEventListener('click', function () { zoomPoster(poster); });
     tighten();
     setEventState();
     // 活動內容是從後台載入的，載入後再判斷一次
