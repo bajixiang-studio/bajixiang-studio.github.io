@@ -3505,12 +3505,24 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 
 /* 各區塊內文字縮小到好讀的大小 */
 .about-intro{font-size:19px !important;line-height:2.1 !important;color:rgba(250,246,238,.9) !important}
-.event-tag,.event-free{font-size:14px !important;letter-spacing:2px !important}
+.event-tag{font-size:14px !important;letter-spacing:2px !important}
+/* 活動區：主標縮小、內文與費用放大，讓左右欄比例協調 */
+.event-title-cn{font-size:clamp(22px,2.4vw,32px) !important;letter-spacing:2px !important;line-height:1.5 !important}
 .event-title-sub{font-size:18px !important}
 .event-detail-icon{font-size:22px !important}
-.event-dl{font-size:13px !important}
-.event-dv{font-size:17px !important}
-.event-ds{font-size:15px !important}
+.event-dl{font-size:14px !important}
+.event-dv{font-size:19px !important}
+.event-ds{font-size:17px !important;line-height:1.85 !important}
+/* 費用改用一般字體，金額才看得清楚 */
+.event-free{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
+  font-size:19px !important;letter-spacing:1px !important;font-weight:600;padding:12px 24px !important;white-space:normal !important}
+#event-register-link{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
+  font-size:17px !important;letter-spacing:3px !important;font-weight:600}
+@media (max-width:640px){
+  .event-dv{font-size:17px !important}
+  .event-ds{font-size:16px !important}
+  .event-free{font-size:17px !important}
+}
 .plan-series-title{font-size:18px !important;letter-spacing:3px !important}
 .plan-name{font-size:20px !important}
 .pci-btn{font-size:14px !important;letter-spacing:1px !important}
