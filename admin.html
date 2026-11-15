@@ -136,7 +136,8 @@
     </div>
 
     <div class="tabs">
-      <div class="tab active" data-tab="content">內容編輯</div>
+      <div class="tab active" data-tab="event">近期活動</div>
+      <div class="tab" data-tab="content">內容編輯</div>
       <div class="tab" data-tab="regs">報名管理</div>
       <div class="tab" data-tab="photos">相片管理</div>
       <div class="tab" data-tab="courses">課程管理</div>
@@ -147,8 +148,15 @@
       <div class="tab" data-tab="shop">商城</div>
     </div>
 
+    <!-- 近期活動（首頁活動區） -->
+    <div class="panel active" id="panel-event">
+      <div class="sub" style="margin-bottom:16px">首頁「近期活動」區塊的內容，每一欄改完按該欄的「儲存」。留空的欄位網站不會顯示。<br>
+        活動海報請到「相片管理 → 特定圖片 → 活動主圖」上傳。活動時間請寫成「2026年12月27日（日）」的格式，日期過了網站會自動改成活動回顧。</div>
+      <div id="eventList"></div>
+    </div>
+
     <!-- 內容編輯 -->
-    <div class="panel active" id="panel-content">
+    <div class="panel" id="panel-content">
       <div class="add-field">
         <input type="text" id="newKey" placeholder="新欄位名稱，例如 announcement">
         <button class="btn-outline" id="addKeyBtn">新增欄位</button>
@@ -831,10 +839,20 @@
       if (have[k] && !have[k + '_en']) rows.push({ key: k + '_en', value: '' });
     });
     rows.sort(function(a, b){ return a.key < b.key ? -1 : a.key > b.key ? 1 : 0; });
+    // 活動欄位放到「近期活動」分頁，依網站上的順序排列（中文欄位後面接英文版）
+    var evList = document.getElementById('eventList');
+    if (evList) evList.innerHTML = '';
+    var evRank = function(k){ var base = k.replace(/_en$/, ''), i = EVENT_ORDER.indexOf(base); return i < 0 ? -1 : i * 2 + (k !== base ? 1 : 0); };
+    var evRows = rows.filter(function(row){ return evList && evRank(row.key) >= 0; })
+      .sort(function(a, b){ return evRank(a.key) - evRank(b.key); });
+    evRows.forEach(function(row){ evList.appendChild(renderContentCard(row.key, row.value)); });
     rows.forEach(function(row){
+      if (evList && evRank(row.key) >= 0) return;
       list.appendChild(renderContentCard(row.key, row.value));
     });
   }
+  var EVENT_ORDER = ['event_title', 'event_title_sub', 'event_tag', 'event_time', 'event_location', 'event_free_note', 'event_host', 'event_role',
+    'event_register_url', 'event_exp_title', 'event_exp_sub'];
   var EVENT_OPTIONAL_KEYS = ['event_tag', 'event_location', 'event_free_note', 'event_host', 'event_role', 'event_register_url'];
   var CONTENT_KEYS_WITH_EN = ['event_title', 'event_title_sub', 'event_time', 'event_exp_title', 'event_exp_sub', 'cta_sub', 'hb_title', 'hb_subtitle', 'hb_intro',
     'event_tag', 'event_location', 'event_free_note', 'event_host', 'event_role'];
