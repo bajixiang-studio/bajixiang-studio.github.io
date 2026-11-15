@@ -3558,7 +3558,15 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 #event-main-image{cursor:zoom-in;width:100%}
 .ev-zoom{position:fixed;inset:0;z-index:10050;background:rgba(5,14,28,.92);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
 .ev-zoom img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 10px 40px rgba(0,0,0,.5)}
-.ev-zoom button{position:absolute;top:14px;right:16px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(201,168,76,.6);background:rgba(11,31,58,.8);color:#F5E6B8;font-size:20px;cursor:pointer}
+.ev-zoom button{position:absolute;width:44px;height:44px;border-radius:50%;border:1px solid rgba(201,168,76,.6);background:rgba(11,31,58,.8);color:#F5E6B8;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.ev-zoom button:hover{background:var(--gold,#C9A84C);color:#0B1F3A}
+.ev-zoom .ev-zoom-x{top:14px;right:16px}
+.ev-zoom .ev-zoom-nav{top:50%;transform:translateY(-50%);width:50px;height:50px;font-size:28px}
+.ev-zoom .ev-zoom-prev{left:16px}.ev-zoom .ev-zoom-next{right:16px}
+.ev-zoom img{cursor:default}
+.ev-zoom-count{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#F5E6B8;font-size:14px;letter-spacing:2px;background:rgba(11,31,58,.7);padding:4px 12px;border-radius:999px}
+#latest-events-gallery img{cursor:zoom-in}
+@media (max-width:600px){.ev-zoom .ev-zoom-nav{width:40px;height:40px;font-size:22px}.ev-zoom .ev-zoom-prev{left:6px}.ev-zoom .ev-zoom-next{right:6px}}
 #event-register-link{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
   font-size:17px !important;letter-spacing:3px !important;font-weight:600}
 @media (max-width:640px){
@@ -7879,28 +7887,64 @@ document.addEventListener('keydown', function(e) {
     });
   }
 
-  // 點活動海報：全螢幕放大，方便看清楚海報上的小字
-  function zoomPoster(img) {
-    var src = img.currentSrc || img.src;
-    if (!src || src.indexOf('data:image/gif') === 0) return;
+  // 點海報：彈出單張放大檢視（活動海報、最新消息海報）；同一組有多張時可左右切換
+  function zoomPoster(img, list) {
+    list = (list && list.length ? list : [img]).filter(function (i) { var s = i.currentSrc || i.src; return s && s.indexOf('data:image/gif') !== 0; });
+    var idx = Math.max(0, list.indexOf(img));
+    if (!list.length) return;
+    var last = document.activeElement;
     var box = document.createElement('div');
     box.className = 'ev-zoom';
     box.setAttribute('role', 'dialog');
-    box.setAttribute('aria-label', '活動海報放大檢視');
-    box.innerHTML = '<img alt="' + esc(img.alt || '活動海報') + '"><button type="button" aria-label="關閉">✕</button>';
-    box.querySelector('img').src = src;
-    function close() { box.remove(); document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; }
-    function onKey(e) { if (e.key === 'Escape') close(); }
-    box.addEventListener('click', close);
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', '海報放大檢視');
+    box.innerHTML = '<img alt=""><button type="button" class="ev-zoom-x" aria-label="關閉">✕</button>' +
+      (list.length > 1 ? '<button type="button" class="ev-zoom-nav ev-zoom-prev" aria-label="上一張">‹</button><button type="button" class="ev-zoom-nav ev-zoom-next" aria-label="下一張">›</button><div class="ev-zoom-count"></div>' : '');
+    var big = box.querySelector('img'), count = box.querySelector('.ev-zoom-count');
+    function show(i) {
+      idx = (i + list.length) % list.length;
+      big.src = list[idx].currentSrc || list[idx].src;
+      big.alt = list[idx].alt || '海報';
+      if (count) count.textContent = (idx + 1) + ' / ' + list.length;
+    }
+    function close() { box.remove(); document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; if (last && last.focus) last.focus(); }
+    function onKey(e) {
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft' && list.length > 1) show(idx - 1);
+      else if (e.key === 'ArrowRight' && list.length > 1) show(idx + 1);
+    }
+    box.addEventListener('click', function (e) {
+      if (e.target.closest('.ev-zoom-prev')) { show(idx - 1); return; }
+      if (e.target.closest('.ev-zoom-next')) { show(idx + 1); return; }
+      if (e.target === big) return;  // 點圖片本身不關閉
+      close();
+    });
+    // 手機左右滑動切換
+    var sx = null;
+    box.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; }, { passive: true });
+    box.addEventListener('touchend', function (e) {
+      if (sx === null || list.length < 2) return;
+      var dx = e.changedTouches[0].clientX - sx; sx = null;
+      if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+    });
+    show(idx);
     document.addEventListener('keydown', onKey);
     document.body.appendChild(box);
     document.body.style.overflow = 'hidden';
-    box.querySelector('button').focus();
+    box.querySelector('.ev-zoom-x').focus();
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     var poster = document.getElementById('event-main-image');
     if (poster) poster.addEventListener('click', function () { zoomPoster(poster); });
+    // 最新消息的海報（後台陸續載入）：點了彈出單張，可左右看其他張
+    var latest = document.getElementById('latest-events-gallery');
+    if (latest) latest.addEventListener('click', function (e) {
+      var img = e.target.closest('img');
+      if (!img) return;
+      e.preventDefault();
+      zoomPoster(img, Array.prototype.slice.call(latest.querySelectorAll('img')));
+    });
     tighten();
     setEventState();
     // 活動內容是從後台載入的，載入後再判斷一次
