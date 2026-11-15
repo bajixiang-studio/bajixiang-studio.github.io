@@ -3523,7 +3523,8 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 .event-tag{font-size:14px !important;letter-spacing:2px !important}
 /* 活動區：主標縮小、內文與費用放大，讓左右欄比例協調 */
 /* 主標控制在兩行內（約 26px，左欄一行可放 15 字），斷行平均分配 */
-.event-title-cn{font-size:clamp(20px,1.9vw,26px) !important;letter-spacing:1px !important;line-height:1.55 !important;text-wrap:balance}
+.event-title-cn{font-size:clamp(20px,1.9vw,26px) !important;letter-spacing:1px !important;line-height:1.55 !important;text-wrap:balance;
+  word-break:keep-all;overflow-wrap:anywhere}  /* 只在標點（」｜、空格）處換行，避免把「千人」拆開；太長才強制斷 */
 .event-title-sub{font-size:18px !important}
 .event-detail-icon{font-size:22px !important}
 .event-dl{font-size:14px !important}
