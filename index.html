@@ -3543,6 +3543,12 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 /* 費用改用一般字體，金額才看得清楚 */
 .event-free{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
   font-size:19px !important;letter-spacing:1px !important;font-weight:600;padding:12px 24px !important;white-space:normal !important}
+/* 區塊副標下方的一句說明（課程方案、療癒旅行方案） */
+.ssub-desc{font-size:16px;line-height:1.95;color:var(--text-c,rgba(250,246,238,.82));max-width:620px;margin:12px auto 0;letter-spacing:.5px;text-align:center}
+/* 關於我們：開頭一句當引言、結尾一句當祝福 */
+.about-intro .ab-lead{display:block;font-family:'Noto Serif TC',serif;font-size:1.18em;line-height:1.75;color:var(--gold-p,#F5E6B8);letter-spacing:1px;margin-bottom:18px}
+.about-intro .ab-wish{display:block;margin-top:18px;padding-left:14px;border-left:2px solid rgba(201,168,76,.6);color:var(--gold-l,#E8CB7A);font-style:normal}
+@media (max-width:600px){.hero-br{display:none}}
 /* 最新消息輪播：軌道不能置中，否則第一張會超出左邊、捲不到，兩張都只露一半 */
 #latest-events-gallery.bjx-carousel{justify-content:flex-start !important}
 #latest-events-gallery .extra-gallery-item{display:flex;justify-content:center;align-items:center}
@@ -3955,7 +3961,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
     <h1 class="hero-title i18n-en">Eight Auspicious Music Studio</h1>
     <p class="hero-title-en i18n-zh">Eight Auspicious Music Studio</p>
     <div class="hero-divider"></div>
-    <p class="hero-subtitle"><span class="i18n-zh">以頌缽、聲音與芳療，陪你放鬆身心，探索適合自己的療癒旅程。</span><span class="i18n-en">With singing bowls, sound and aromatherapy, we help you relax body and mind and find the healing journey that suits you.</span></p>
+    <p class="hero-subtitle"><span class="i18n-zh">讓聲音與香氣陪你慢下來，<br class="hero-br">在溫柔的療癒時光裡，重新感受身心的平衡。</span><span class="i18n-en">Let sound and scent help you slow down — and in gentle moments of healing, feel the balance of body and mind again.</span></p>
     <p class="hero-tagline"><span class="i18n-zh">聲音 × 頻率 × 芳療 × 頌缽</span><span class="i18n-en">Sound × Frequency × Aromatherapy × Singing Bowls</span></p>
     <div class="hero-btns">
       <a href="#pricing" class="btn-primary"><span class="i18n-zh">探索課程</span><span class="i18n-en">Explore Courses</span></a>
@@ -4016,7 +4022,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
     <div class="sh">
       <div class="sbadge reveal">Programs</div>
       <h2 class="stitle reveal rd1"><span class="i18n-zh">課 程 方 案</span><span class="i18n-en">Courses & Programs</span></h2>
-      <p class="ssub reveal rd2"><span class="i18n-zh">所有課程均提供客製化諮詢，歡迎洽詢適合您的療癒旅程</span><span class="i18n-en">All courses offer personalised consultation — reach out to find the healing journey that fits you.</span></p>
+      <p class="ssub reveal rd2"><span class="i18n-zh">找到適合你的療癒時光</span><span class="i18n-en">Find the healing time that is right for you</span></p><p class="ssub-desc reveal rd2"><span class="i18n-zh">每一段療癒旅程，都可以從聊聊你的需要開始。</span><span class="i18n-en">Every healing journey can begin with a simple conversation about what you need.</span></p>
       <div class="gline reveal rd3"></div>
     </div>
 
@@ -4255,9 +4261,9 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
     <div class="sh">
       <div class="sbadge reveal">Healing Journey</div>
       <h2 class="stitle reveal rd1"><span class="i18n-zh">療癒旅行方案</span><span class="i18n-en">Healing Journey Packages</span></h2>
-      <p class="ssub reveal rd2"><span class="i18n-zh">把旅行變成一場身心靈重啟之旅</span><span class="i18n-en">Turn travel into a journey that resets body, mind and spirit.</span></p>
-      <p class="ssub reveal rd2 i18n-zh" style="font-size:15px;line-height:2;max-width:640px;margin:14px auto 0;letter-spacing:.5px">你有多久沒有好好停下腳步，聽聽內心的聲音了？離開日常的忙碌與繁瑣，跟著<a href="https://bajixiang-studio.github.io/?utm_source=gemini#travel" target="_blank" rel="noopener" style="color:var(--gold-l);text-decoration:underline">八吉祥音樂工作室</a>，走進大自然的懷抱，找回內在的平靜與靈感。</p>
-      <p class="ssub reveal rd2 i18n-en" style="font-size:15px;line-height:2;max-width:640px;margin:14px auto 0;letter-spacing:.5px">How long has it been since you last paused to listen to your inner voice? Step away from the daily rush with <a href="https://bajixiang-studio.github.io/?utm_source=gemini#travel" target="_blank" rel="noopener" style="color:var(--gold-l);text-decoration:underline">Eight Auspicious Music Studio</a>, and walk into nature's embrace to rediscover inner peace and inspiration.</p>
+      <p class="ssub reveal rd2"><span class="i18n-zh">讓身心，重新出發</span><span class="i18n-en">Let body and mind begin anew</span></p>
+      <p class="ssub-desc reveal rd2"><span class="i18n-zh">跟著八吉祥工作室，走進自然、聆聽內在，<br class="hero-br">為自己留一段安定身心的時光。</span><span class="i18n-en">Journey with Eight Auspicious Studio into nature, listen within, and keep a little time to settle body and mind.</span></p>
+      
       <div class="gline reveal rd3"></div>
     </div>
 
@@ -4353,8 +4359,8 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
           <h2 class="stitle reveal rd1"><span class="i18n-zh">關 於 我 們</span><span class="i18n-en">About Us</span></h2>
           <div class="gline reveal rd2" style="margin-left:0;"></div>
         </div>
-        <p class="about-intro reveal rd3 i18n-zh">八吉祥音樂工作室以西藏八大吉祥符號為靈感，將古老智慧與現代頻率科學完美融合。<br><br>我們相信，每個人內在都有與生俱來的自我修復力，只待被喚醒。透過聲音、頻率、芳療與頌缽，協助你回歸身心靈的平衡與自然。</p>
-        <p class="about-intro reveal rd3 i18n-en">Eight Auspicious Music Studio draws inspiration from the Eight Auspicious Symbols of Tibet, blending ancient wisdom with modern frequency science.<br><br>We believe everyone carries an innate power of self-healing, waiting to be awakened. Through sound, frequency, aromatherapy and singing bowls, we help you return to balance and harmony of body, mind and spirit.</p>
+        <p class="about-intro reveal rd3 i18n-zh"><span class="ab-lead">八吉祥音樂工作室，陪你在聲音與香氣中，慢慢回到自己。</span>我們以頌缽、音樂與芳香療癒，打造一處可以放慢腳步、安放心緒的空間。無論你想舒緩日常疲憊、重新感受身心，或只是為自己留一段寧靜時光，都能在這裡找到適合自己的療癒步調。<span class="ab-wish">願每一次相遇，都成為你重新聆聽自己、溫柔照顧自己的開始。</span></p>
+        <p class="about-intro reveal rd3 i18n-en"><span class="ab-lead">Eight Auspicious Music Studio — slowly finding your way back to yourself through sound and scent.</span>With singing bowls, music and aromatherapy, we have created a space where you can slow down and set your mind at rest. Whether you want to ease everyday fatigue, reconnect with body and mind, or simply keep a quiet moment for yourself, you can find a healing pace that suits you here.<span class="ab-wish">May every meeting become a new beginning — listening to yourself again, and caring for yourself gently.</span></p>
       </div>
       <div class="about-right">
         <div class="about-pillars-img reveal rd2">
