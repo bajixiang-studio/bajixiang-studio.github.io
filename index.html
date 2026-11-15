@@ -7280,7 +7280,7 @@ document.addEventListener('keydown', function(e) {
 
   function sessionLine(s) {
     var row = el('li', 'cc-session' + (s.status ? ' is-' + (STATUS_CLS[s.status] || 'x') : ''));
-    row.appendChild(el('span', 'cc-s-date', s.date || ''));
+    row.appendChild(s.date_en ? bi('span', 'cc-s-date', s.date || '', s.date_en) : el('span', 'cc-s-date', s.date || ''));
     if (s.time) row.appendChild(el('span', 'cc-s-time', s.time));
     if (s.location) row.appendChild(el('span', 'cc-s-loc', s.location));
     if (s.status) row.appendChild(bi('span', 'cc-s-status', s.status, STATUS_EN[s.status]));
@@ -7608,6 +7608,9 @@ document.addEventListener('keydown', function(e) {
       description: t.description, description_en: t.description_en,
       features_text: t.features_text, features_text_en: t.features_text_en,
       image_url: t.image_url, line_link: t.line_link,
+      // 後台「出發日期」「費用」：有填才顯示，沒填顯示洽詢字樣
+      sessions: t.travel_date ? [{ date: t.travel_date, date_en: t.travel_date_en }] : [],
+      price_note: t.price_note || '', price_note_en: t.price_note_en || '',
       labels: LABELS, skipRows: past ? ['dates', 'time', 'fee'] : ['time']
     };
   }
@@ -7619,7 +7622,9 @@ document.addEventListener('keydown', function(e) {
     if (ov) rows.push(ov);
     if (window.supabase) {
       var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      var r = await sb.from('travels').select('id,title,title_en,subtitle,subtitle_en,image_url,description,description_en,features_text,features_text_en,status,line_link,sort_order').order('sort_order');
+      var cols = 'id,title,title_en,subtitle,subtitle_en,image_url,description,description_en,features_text,features_text_en,status,line_link,sort_order';
+      var r = await sb.from('travels').select(cols + ',travel_date,travel_date_en,price_note,price_note_en').order('sort_order');
+      if (r.error) r = await sb.from('travels').select(cols).order('sort_order');  // 日期／費用欄位還沒建立
       if (!r.error) {
         var list = r.data || [];
         // 即將出發的排前面，曾經舉辦的排後面

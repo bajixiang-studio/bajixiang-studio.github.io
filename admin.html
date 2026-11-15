@@ -2085,9 +2085,13 @@
     var list = document.getElementById('travelList');
     if (!list) return;
     list.innerHTML = '載入中...';
+    var travelCols = 'id,title,title_en,subtitle,subtitle_en,image_url,description,description_en,features_text,features_text_en,status,line_link,sort_order';
     var result = await sb.from('travels')
-      .select('id,title,title_en,subtitle,subtitle_en,image_url,description,description_en,features_text,features_text_en,status,line_link,sort_order')
+      .select(travelCols + ',' + TRAVEL_V2_COLS.join(','))
       .order('sort_order', { ascending: true });
+    travelV2 = !result.error;
+    // 還沒執行 supabase_schema_travels_v2.sql 時，日期／費用欄位不存在，改用原本的欄位
+    if (result.error) result = await sb.from('travels').select(travelCols).order('sort_order', { ascending: true });
     if (result.error) {
       list.innerHTML = '尚未建立 travels 資料表，或載入失敗：' + result.error.message +
         '<br>（需請開發者先在 Supabase 建立 travels 資料表）';
@@ -2113,6 +2117,17 @@
     });
   }
 
+  var TRAVEL_V2_COLS = ['travel_date', 'travel_date_en', 'price_note', 'price_note_en'];
+  var travelV2 = false;
+  function travelV2Fields(row){
+    if (!travelV2) return '<div class="field" style="margin-top:8px;opacity:.75;font-size:13px">（出發日期、費用欄位尚未啟用：請先在 Supabase 執行 supabase_schema_travels_v2.sql）</div>';
+    var f = function(cls, label, val, ph){ return '<div class="field" style="margin-top:8px"><label>' + label + '</label><input type="text" class="' + cls + '" value="' + (val ? escapeHtml(val) : '') + '" placeholder="' + ph + '"></div>'; };
+    return f('travel-date-input', '出發日期（留空顯示「近期公布」）', row.travel_date, '例：2026/12/26（六）～12/28（一）三天兩夜') +
+      f('travel-dateen-input', '出發日期（英文，選填）', row.travel_date_en, '例：Dec 26–28, 2026 · 3 days 2 nights') +
+      f('travel-price-input', '費用（留空顯示「費用請洽官方 LINE」）', row.price_note, '例：每人 NT$25,000（兩人一房）') +
+      f('travel-priceen-input', '費用（英文，選填）', row.price_note_en, '例：NT$25,000 per person (twin share)');
+  }
+
   function renderTravelCard(row, idx){
     var card = document.createElement('div');
     card.className = 'photo-card';
@@ -2134,6 +2149,7 @@
         '<div class="field" style="margin-top:8px"><label>行程名稱（英文，選填）</label><input type="text" class="travel-titleen-input" value="' + (row.title_en ? escapeHtml(row.title_en) : '') + '" placeholder="留空則英文版也顯示中文名稱"></div>' +
         '<div class="field" style="margin-top:8px"><label>副標題</label><input type="text" class="travel-subtitle-input" value="' + (row.subtitle ? escapeHtml(row.subtitle) : '') + '"></div>' +
         '<div class="field" style="margin-top:8px"><label>副標題（英文，選填）</label><input type="text" class="travel-subtitleen-input" value="' + (row.subtitle_en ? escapeHtml(row.subtitle_en) : '') + '" placeholder="留空則英文版也顯示中文副標題"></div>' +
+        travelV2Fields(row) +
         '<div class="field" style="margin-top:8px"><label>更換主圖（選填）</label><input type="file" accept="image/*" class="travel-img-input"></div>' +
         '<div class="field" style="margin-top:8px"><label>行程介紹</label><textarea rows="3" class="travel-desc-input">' + (row.description ? escapeHtml(row.description) : '') + '</textarea></div>' +
         '<div class="field" style="margin-top:8px"><label>行程介紹（英文，選填）</label><textarea rows="3" class="travel-descen-input" placeholder="留空則英文版也顯示中文介紹">' + (row.description_en ? escapeHtml(row.description_en) : '') + '</textarea></div>' +
@@ -2181,6 +2197,12 @@
           description_en: card.querySelector('.travel-descen-input').value.trim() || null,
           features_text_en: card.querySelector('.travel-featuresen-input').value.trim() || null
         };
+        if (travelV2) {
+          updates.travel_date = card.querySelector('.travel-date-input').value.trim() || null;
+          updates.travel_date_en = card.querySelector('.travel-dateen-input').value.trim() || null;
+          updates.price_note = card.querySelector('.travel-price-input').value.trim() || null;
+          updates.price_note_en = card.querySelector('.travel-priceen-input').value.trim() || null;
+        }
         var fileInput = card.querySelector('.travel-img-input');
         if (fileInput.files[0]) {
           updates.image_url = await uploadImageFile(fileInput.files[0], 'travel');
