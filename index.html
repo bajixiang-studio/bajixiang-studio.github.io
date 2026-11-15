@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#0B1F3A">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="google" content="notranslate">
-<meta name="description" content="八吉祥音樂工作室 — 聲音×頻率×芳療×頌缽×靈療。公益音樂下午茶活動，透過八大吉祥頻率系統協助身心靈回歸平衡。">
+<meta name="description" content="八吉祥音樂工作室 — 聲音×頻率×芳療×頌缽×靈療。頌缽療癒課程與活動，透過八大吉祥頻率系統協助身心靈回歸平衡。">
 <meta name="keywords" content="頌缽療癒,音樂療癒,頻率療癒,芳療,身心靈,八吉祥,公益活動,台北">
 <meta property="og:title" content="八吉祥音樂工作室 | Eight Auspicious Music Studio">
 <meta property="og:description" content="公益音樂下午茶 — 香巴拉傳奇，人間最後淨土">
@@ -4121,9 +4121,9 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
 <section id="event">
   <div class="si">
     <div class="sh">
-      <div class="sbadge reveal">Charity Music Afternoon</div>
-      <h2 class="stitle reveal rd1"><span class="i18n-zh">公 益 音 樂 下 午 茶</span><span class="i18n-en">Charity Music Afternoon</span></h2>
-      <p class="ssub reveal rd2"><span class="i18n-zh">音律舒活 · 心靈饗宴 · 愛心交流</span><span class="i18n-en">Sound & Vitality · A Feast for the Soul · Sharing with Love</span></p>
+      <div class="sbadge reveal" id="event-sec-badge">Upcoming Events</div>
+      <h2 class="stitle reveal rd1"><span class="i18n-zh">近期活動</span><span class="i18n-en">Upcoming Events</span></h2>
+      <p class="ssub reveal rd2"><span class="i18n-zh">聲音療癒・公益參與・國際交流</span><span class="i18n-en">Sound Healing · Giving Back · Global Connection</span></p>
       <div class="gline reveal rd3"></div>
     </div>
     <div class="event-hero">
@@ -4156,7 +4156,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
         
       </div>
       <div class="event-img-wrap reveal rd2">
-        <img id="event-main-image" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="公益音樂下午茶活動海報">
+        <img id="event-main-image" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="近期活動海報">
       </div>
     </div></div>
 
@@ -7739,6 +7739,15 @@ document.addEventListener('keydown', function(e) {
     // （這些元素原本有 display 樣式，hidden 屬性蓋不過，所以直接設 style.display）
     // 後台還沒建立這個欄位時維持網頁原本的內容；建立了但留空才隱藏
     var set = function (k) { return Object.prototype.hasOwnProperty.call(v, k); };
+    // 區塊標題（小字英文、大標題、副標）：後台有填就換掉預設的「近期活動」
+    var sh = sec.querySelector('.sh');
+    if (sh) {
+      var bEl = sh.querySelector('.sbadge'), tEl = sh.querySelector('.stitle'), sEl = sh.querySelector('.ssub');
+      if (bEl && val('event_section_badge')) bEl.textContent = val('event_section_badge');
+      if (tEl && val('event_section_title')) tEl.innerHTML = bilingual(val('event_section_title'), val('event_section_title_en'));
+      if (sEl && val('event_section_sub')) sEl.innerHTML = bilingual(val('event_section_sub'), val('event_section_sub_en'));
+      if (original && bEl && tEl) { original.badge = bEl.innerHTML; original.title = tEl.innerHTML; }  // 活動還沒結束時顯示這個標題
+    }
     if (tag && set('event_tag')) { tag.style.display = val('event_tag') ? '' : 'none'; if (val('event_tag')) tag.innerHTML = bilingual(val('event_tag'), val('event_tag_en')); }
     // 費用／參加方式：留空就不顯示
     var fee = sec.querySelector('.event-free');
