@@ -3392,9 +3392,24 @@ nav,nav.scrolled{background:rgba(11,31,58,.94) !important;backdrop-filter:blur(1
 .nav-links li.has-sub.menu-closed > .sub-menu{opacity:0 !important;visibility:hidden !important;pointer-events:none !important}
 .sub-menu{transition:opacity .25s ease,transform .25s ease,visibility 0s linear .3s !important}
 .has-sub:hover > .sub-menu,.has-sub:focus-within > .sub-menu{opacity:1 !important;visibility:visible !important;pointer-events:auto !important;transform:translateX(-50%) translateY(0) !important;transition:opacity .25s ease,transform .25s ease,visibility 0s !important}
-.nav-links .nav-cta{font-size:17px !important;padding:9px 22px !important;border-radius:2px;background:var(--gold) !important;border-color:var(--gold) !important;color:var(--navy) !important;font-weight:700 !important;text-shadow:none;box-shadow:0 0 18px rgba(201,168,76,.35)}
-.nav-links .nav-cta:hover{background:var(--gold-l) !important;color:var(--navy) !important}
+/* 「預約體驗」：圓角膠囊、金色漸層，定時閃過一道光，外圈微微呼吸發光 */
+.nav-links .nav-cta{position:relative;overflow:hidden;display:inline-flex !important;align-items:center;gap:7px;
+  font-size:17px !important;padding:9px 24px 9px 20px !important;border-radius:999px !important;
+  background:linear-gradient(135deg,#F3DE9C 0%,#D9B65C 45%,#B98F33 100%) !important;border:1px solid rgba(255,236,180,.75) !important;
+  color:#0B1F3A !important;font-weight:700 !important;letter-spacing:2px !important;text-shadow:none;
+  box-shadow:0 4px 16px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.55);
+  transition:transform .25s ease,box-shadow .25s ease,filter .25s ease;animation:ctaGlow 3.2s ease-in-out infinite}
+.nav-links .nav-cta::before{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);animation:ctaShine 4.5s ease-in-out infinite;pointer-events:none}
 .nav-links .nav-cta::after{display:none}
+.nav-links .nav-cta .nav-cta-ic{width:15px;height:15px;fill:#0B1F3A;flex-shrink:0;transition:transform .4s ease}
+.nav-links .nav-cta:hover,.nav-links .nav-cta:focus-visible{transform:translateY(-2px);filter:brightness(1.06);color:#0B1F3A !important;
+  box-shadow:0 8px 24px rgba(201,168,76,.55),inset 0 1px 0 rgba(255,255,255,.6)}
+.nav-links .nav-cta:hover .nav-cta-ic{transform:rotate(72deg) scale(1.15)}
+@keyframes ctaShine{0%,65%{left:-60%}100%{left:130%}}
+@keyframes ctaGlow{0%,100%{box-shadow:0 4px 16px rgba(201,168,76,.3),0 0 0 0 rgba(232,201,122,.0),inset 0 1px 0 rgba(255,255,255,.55)}
+  50%{box-shadow:0 4px 18px rgba(201,168,76,.45),0 0 0 5px rgba(232,201,122,.14),inset 0 1px 0 rgba(255,255,255,.55)}}
+@media (prefers-reduced-motion:reduce){.nav-links .nav-cta,.nav-links .nav-cta::before{animation:none}}
 .lang-toggle-btn{font-size:12px;padding:5px 12px}
 .mobile-menu{gap:18px !important;z-index:1001 !important}
 .mobile-menu a{font-size:19px !important;letter-spacing:3px !important}
@@ -3860,7 +3875,7 @@ if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
       </ul>
     </li>
     <li data-needs-products hidden><a href="shop.html"><span class="i18n-zh">商城</span><span class="i18n-en">Shop</span></a></li>
-    <li><a href="#cta" class="nav-cta"><span class="i18n-zh">預約體驗</span><span class="i18n-en">Book Now</span></a></li>
+    <li><a href="#cta" class="nav-cta"><svg class="nav-cta-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg><span class="i18n-zh">預約體驗</span><span class="i18n-en">Book Now</span></a></li>
   </ul>
   <button class="lang-toggle-btn" data-lang-toggle>EN</button>
   <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
