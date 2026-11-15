@@ -1554,8 +1554,7 @@
     var sessions = Array.isArray(row.sessions) ? row.sessions : [];
     return '<div class="course-v2" style="margin-top:12px;border:1px solid var(--navy-l);padding:12px">' +
       '<div class="photo-card-key" style="margin-bottom:10px">開課資訊（顯示在網站課程卡上）</div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-        '<div class="field"><label>課程名稱</label><input type="text" class="c-name" value="' + escapeHtml(row.name || '') + '"></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">' +
         '<div class="field"><label>分類</label><input type="text" class="c-cat" value="' + escapeHtml(row.category || '') + '"></div>' +
         '<div class="field"><label>狀態標籤</label><select class="c-status">' + optionList(COURSE_STATUSES, row.status, '（不顯示）') + '</select></div>' +
         '<div class="field"><label>時數／堂數（選填）</label><input type="text" class="c-duration" placeholder="例：一天（7.5 小時）、8 週" value="' + escapeHtml(row.duration_note || '') + '"></div>' +
@@ -1600,7 +1599,6 @@
         location: r.querySelector('.s-loc').value.trim(), status: r.querySelector('.s-status').value
       };
     }).filter(function(s){ return s.date || s.time || s.location; });
-    var name = v('.c-name');
     var out = {
       category: v('.c-cat') || null, status: v('.c-status') || null, duration_note: v('.c-duration') || null,
       sessions: sessions, summary: v('.c-summary') || null, summary_en: v('.c-summary-en') || null,
@@ -1608,7 +1606,6 @@
       note: v('.c-note') || null, note_en: v('.c-note-en') || null, signup_url: v('.c-signup') || null,
       is_active: box.querySelector('.c-active').checked
     };
-    if (name) out.name = name;
     return out;
   }
 
@@ -1701,8 +1698,8 @@
     card.innerHTML =
       imgHtml +
       '<div class="photo-card-body">' +
-        '<div class="photo-card-key">' + escapeHtml(row.name) + '</div>' +
-        '<input type="file" accept="image/*" class="course-img-input">' +
+        '<div class="field"><label>課程名稱</label><input type="text" class="c-name" value="' + escapeHtml(row.name || '') + '"></div>' +
+        '<div class="field" style="margin-top:8px"><label>更換主圖（選填）</label><input type="file" accept="image/*" class="course-img-input"></div>' +
         '<div class="field" style="margin-top:8px">' +
           '<label>英文名稱（選填）</label>' +
           '<input type="text" class="course-nameen-input" value="' + (row.name_en ? escapeHtml(row.name_en) : '') + '" placeholder="留空則英文版也顯示中文名稱">' +
@@ -1857,6 +1854,9 @@
         }
         var v2 = readCourseV2(card);
         if (v2) Object.keys(v2).forEach(function(k){ updates[k] = v2[k]; });
+        // 課程名稱在編輯區最上方；留空就維持原名
+        var newName = card.querySelector('.c-name') && card.querySelector('.c-name').value.trim();
+        if (newName) updates.name = newName;
         if (fileInput.files[0]) {
           updates.image_url = await uploadImageFile(fileInput.files[0], 'course-detail');
         }
