@@ -7600,10 +7600,10 @@ document.addEventListener('keydown', function(e) {
   }
 
   function fromDb(t) {
-    var past = t.status === 'past';
+    var past = t.status === 'past', anytime = t.status === 'anytime';
     return {
       id: t.id, name: t.title, name_en: t.title_en, category: '療癒旅行',
-      status: past ? '曾經舉辦' : '即將出發',
+      status: past ? '曾經舉辦' : anytime ? '隨時預約' : '即將出發',
       summary: t.subtitle, summary_en: t.subtitle_en,
       description: t.description, description_en: t.description_en,
       features_text: t.features_text, features_text_en: t.features_text_en,
@@ -7611,7 +7611,7 @@ document.addEventListener('keydown', function(e) {
       // 後台「出發日期」「費用」：有填才顯示，沒填顯示洽詢字樣
       sessions: t.travel_date ? [{ date: t.travel_date, date_en: t.travel_date_en }] : [],
       price_note: t.price_note || '', price_note_en: t.price_note_en || '',
-      labels: LABELS, skipRows: past ? ['dates', 'time', 'fee'] : ['time']
+      labels: LABELS, skipRows: past ? ['dates', 'time', 'fee'] : anytime && !t.travel_date ? ['dates', 'time'] : ['time']
     };
   }
 
@@ -7627,8 +7627,13 @@ document.addEventListener('keydown', function(e) {
       if (r.error) r = await sb.from('travels').select(cols).order('sort_order');  // 日期／費用欄位還沒建立
       if (!r.error) {
         var list = r.data || [];
-        // 即將出發的排前面，曾經舉辦的排後面
-        rows = rows.concat(list.filter(function (t) { return t.status !== 'past'; }).map(fromDb), list.filter(function (t) { return t.status === 'past'; }).map(fromDb));
+        var kind = function (t) { return t.status === 'anytime' || t.status === 'past' ? t.status : 'upcoming'; };
+        var by = function (s) { return list.filter(function (t) { return kind(t) === s; }).map(fromDb); };
+        var anytime = by('anytime');
+        // 後台已經有「隨時預約」的客製化行程，就用後台的版本，不再顯示網頁內建的那張
+        if (anytime.length) rows = [];
+        // 隨時預約 → 即將出發 → 曾經舉辦
+        rows = rows.concat(anytime, by('upcoming'), by('past'));
       }
     }
     if (!rows.length) return;

@@ -2097,7 +2097,7 @@
 
   // ---- 療癒旅行：即將舉辦／曾經舉辦 行程管理（讀寫 travels 表）----
   var travelsCache = [];
-  var STATUS_LABELS = { upcoming: '即將舉辦', past: '曾經舉辦' };
+  var STATUS_LABELS = { anytime: '隨時預約（客製化行程）', upcoming: '即將舉辦', past: '曾經舉辦' };
 
   async function loadTravelsAdmin(){
     var list = document.getElementById('travelList');
@@ -2159,6 +2159,7 @@
         '<div class="field" style="margin-top:8px">' +
           '<label>狀態</label>' +
           '<select class="travel-status-input">' +
+            '<option value="anytime"' + (row.status === 'anytime' ? ' selected' : '') + '>隨時預約（客製化行程，網站排第一張）</option>' +
             '<option value="upcoming"' + (row.status === 'upcoming' ? ' selected' : '') + '>即將舉辦</option>' +
             '<option value="past"' + (row.status === 'past' ? ' selected' : '') + '>曾經舉辦</option>' +
           '</select>' +
