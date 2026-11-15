@@ -104,6 +104,25 @@
   .course-item.open .course-body{display:block}
   .course-body .photo-card{margin:0;border:0}
   @media(max-width:640px){.course-head{flex-wrap:wrap}.course-head-acts{width:100%;justify-content:flex-start}.course-body .photo-card{flex-direction:column}}
+  /* 分頁標籤不換行（太多時可左右滑） */
+  .tabs{overflow-x:auto;scrollbar-width:thin}
+  .tab{white-space:nowrap;flex-shrink:0}
+  /* 可開合的區塊（相片管理／課程管理／療癒旅行／療癒分享） */
+  .sub-h.fold-h{cursor:pointer;user-select:none;display:flex;align-items:center;gap:10px;padding:12px 14px;margin:14px 0 0;
+    border:1px solid var(--navy-l);background:var(--navy-m)}
+  .sub-h.fold-h::before{content:"▸";color:var(--gold);transition:transform .2s;display:inline-block}
+  .sub-h.fold-h.open::before{transform:rotate(90deg)}
+  .sub-h.fold-h.open{border-color:var(--gold-d)}
+  .sub-h.fold-h .fold-n{margin-left:auto;font-size:12px;opacity:.6;letter-spacing:1px}
+  .fold-body{display:none;padding:14px 0 6px}
+  .sub-h.fold-h.open + .fold-body{display:block}
+  /* 可開合的單筆資料（旅行行程、療癒分享）：收合時只顯示標題 */
+  .fold-head{cursor:pointer;color:var(--gold-l);font-size:15px;letter-spacing:1px;display:flex;align-items:center;gap:8px;min-height:32px}
+  .fold-head::after{content:"展開編輯 ▾";margin-left:auto;font-size:12px;opacity:.7;white-space:nowrap}
+  .fold-card.open .fold-head::after{content:"收合 ▴"}
+  .fold-card:not(.open) .fold-body-inner > :not(.fold-head){display:none !important}
+  .fold-card:not(.open) > img,.fold-card:not(.open) > video{width:56px !important;height:56px !important;object-fit:cover}
+  .fold-card:not(.open){align-items:center}
 /* 相片上傳不需要說明文字：隱藏各區的「說明文字（選填）」欄位 */
 .field:has(> [id^="newGalleryCaption-"]){display:none}
 </style>
@@ -828,6 +847,58 @@
     });
   });
 
+  // ---- 可開合區塊：相片管理、課程管理、療癒旅行、療癒分享 ----
+  // 每個小標題（sub-h）到下一個小標題之間的內容收進一個可開合的區塊；
+  // 預設「目前…」清單展開、其他（新增表單、各類相片）收合；開合狀態會記在這台電腦上
+  var FOLD_PANELS = ['photos', 'courses', 'travel', 'stories'];
+  var FOLD_KEY = 'bjxAdminFolds';
+  var foldState = {};
+  try { foldState = JSON.parse(localStorage.getItem(FOLD_KEY) || '{}') || {}; } catch(e) {}
+  function saveFolds(){ try { localStorage.setItem(FOLD_KEY, JSON.stringify(foldState)); } catch(e) {} }
+  FOLD_PANELS.forEach(function(name){
+    var panel = document.getElementById('panel-' + name);
+    if (!panel) return;
+    Array.prototype.slice.call(panel.children).forEach(function(h){
+      if (!h.classList.contains('sub-h')) return;
+      var body = document.createElement('div');
+      body.className = 'fold-body';
+      while (h.nextSibling && !(h.nextSibling.classList && h.nextSibling.classList.contains('sub-h'))) body.appendChild(h.nextSibling);
+      h.parentNode.insertBefore(body, h.nextSibling);
+      var key = name + ':' + h.textContent.trim();
+      var open = key in foldState ? foldState[key] : /^目前/.test(h.textContent.trim());
+      h.classList.add('fold-h');
+      h.classList.toggle('open', open);
+      h.setAttribute('role', 'button');
+      h.setAttribute('tabindex', '0');
+      h.setAttribute('aria-expanded', open);
+      function toggle(){
+        var o = !h.classList.contains('open');
+        h.classList.toggle('open', o);
+        h.setAttribute('aria-expanded', o);
+        foldState[key] = o; saveFolds();
+      }
+      h.addEventListener('click', toggle);
+      h.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+  });
+
+  // 單筆資料（旅行行程、療癒分享）收合成一行標題，點標題展開編輯；重新載入清單後維持原本展開的那幾筆
+  var openCards = {};
+  function makeFoldCard(card, bodyEl, id, title){
+    var head = document.createElement('div');
+    head.className = 'fold-head';
+    head.textContent = title || '（未命名）';
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    bodyEl.classList.add('fold-body-inner');
+    bodyEl.insertBefore(head, bodyEl.firstChild);
+    card.classList.add('fold-card');
+    card.classList.toggle('open', !!openCards[id]);
+    function toggle(){ var o = !card.classList.contains('open'); card.classList.toggle('open', o); openCards[id] = o; }
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  }
+
   // ---- 內容編輯 ----
   async function loadContent(){
     var list = document.getElementById('contentList');
@@ -1335,6 +1406,8 @@
     });
     if (!$('.up').disabled) $('.up').addEventListener('click', function(){ swapStoryOrder(idx, idx - 1); });
     if (!$('.down').disabled) $('.down').addEventListener('click', function(){ swapStoryOrder(idx, idx + 1); });
+    makeFoldCard(card, $('.body'), 'story:' + row.id,
+      (row.name || '（未填稱呼）') + (row.title ? '｜' + row.title : '') + (row.visible === false ? '　（未顯示在網站）' : ''));
     return card;
   }
 
@@ -2132,8 +2205,6 @@
       return;
     }
     travelsCache = result.data || [];
-    var importBox = document.getElementById('travelImportBox');
-    if (importBox) importBox.style.display = travelsCache.some(function(r){ return r.status === 'anytime'; }) ? 'none' : '';
     list.innerHTML = '';
     if (!travelsCache.length) {
       list.innerHTML = '<div class="empty">尚未新增任何行程</div>';
@@ -2284,6 +2355,11 @@
       btn.disabled = false;
     });
 
+    // 收合時只顯示行程名稱與狀態
+    var oldKey = card.querySelector('.photo-card-key');
+    if (oldKey) oldKey.remove();
+    makeFoldCard(card, card.querySelector('.photo-card-body'), 'travel:' + row.id,
+      (row.title || '') + '　（' + (STATUS_LABELS[row.status] || row.status || '') + '）');
     return card;
   }
 
