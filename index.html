@@ -3533,6 +3533,12 @@ section{padding:clamp(64px,8vw,104px) 0 !important;background:var(--sec-a) !impo
 /* 費用改用一般字體，金額才看得清楚 */
 .event-free{font-family:'微軟正黑體','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif !important;font-style:normal !important;
   font-size:19px !important;letter-spacing:1px !important;font-weight:600;padding:12px 24px !important;white-space:normal !important}
+/* 最新消息輪播：軌道不能置中，否則第一張會超出左邊、捲不到，兩張都只露一半 */
+#latest-events-gallery.bjx-carousel{justify-content:flex-start !important}
+#latest-events-gallery .extra-gallery-item{display:flex;justify-content:center;align-items:center}
+/* 長海報整張都看得到：高度最多約一個螢幕，寬度依比例縮 */
+#latest-events-gallery .extra-gallery-frame{display:flex;justify-content:center;width:100%}
+#latest-events-gallery .extra-gallery-img{width:auto !important;max-width:100%;max-height:min(78vh,820px);height:auto !important;margin:0 auto;display:block}
 /* 海報欄加寬（原本約 413px），點海報可放大看細節 */
 @media (min-width:900px){
   #event .event-hero{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) !important;gap:40px !important}
@@ -7655,8 +7661,8 @@ document.addEventListener('keydown', function(e) {
   async function load() {
     var kit = window.bjxCourseKit, sec = document.getElementById('travel');
     if (!kit || !sec) return;
-    var rows = [], ov = overview();
-    if (ov) rows.push(ov);
+    // 網頁內建的「客製化療癒旅行規劃」已搬進後台，之後一律以後台資料為準（後台刪掉就不顯示）
+    var rows = [];
     if (window.supabase) {
       var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       var cols = 'id,title,title_en,subtitle,subtitle_en,image_url,description,description_en,features_text,features_text_en,status,line_link,sort_order';
@@ -7666,14 +7672,16 @@ document.addEventListener('keydown', function(e) {
         var list = r.data || [];
         var kind = function (t) { return t.status === 'anytime' || t.status === 'past' ? t.status : 'upcoming'; };
         var by = function (s) { return list.filter(function (t) { return kind(t) === s; }).map(fromDb); };
-        var anytime = by('anytime');
-        // 後台已經有「隨時預約」的客製化行程，就用後台的版本，不再顯示網頁內建的那張
-        if (anytime.length) rows = [];
         // 隨時預約 → 即將出發 → 曾經舉辦
-        rows = rows.concat(anytime, by('upcoming'), by('past'));
+        rows = rows.concat(by('anytime'), by('upcoming'), by('past'));
+      } else {
+        return;  // 讀不到資料庫時保留原本的版面
       }
     }
-    if (!rows.length) return;
+    if (!rows.length) {  // 後台沒有任何行程：隱藏舊的海報卡，區塊只留標題與介紹
+      sec.classList.add('tr-ready');
+      return;
+    }
     var wrap = kit.el('div', 'cc-wrap tr-wrap');
     var grid = kit.el('div', 'cc-grid');
     rows.forEach(function (t) { grid.appendChild(kit.card(t)); });
