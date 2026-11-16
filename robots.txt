@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# 後台與舊版備份頁面不需要被搜尋到（避免和首頁內容重複）
+Disallow: /admin.html
+Disallow: /index-old.html
+Disallow: /index%20.html
+
+Sitemap: https://bajixiang-studio.github.io/sitemap.xml
